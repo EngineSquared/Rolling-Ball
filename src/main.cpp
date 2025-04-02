@@ -175,13 +175,13 @@ int main(void)
 
 	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(std::move(ES::Plugin::Input::Resource::InputManager()));
 
-	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&core](ES::Engine::Core &core) {
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
 		auto floor = CreateFloor(core);
 	});
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::SpawnPlayer);
 
-	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&core](ES::Engine::Core &core) {
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
 		core.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
 		core.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(2);
 
