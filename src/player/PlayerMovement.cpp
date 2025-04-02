@@ -4,6 +4,7 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 
+#include "Camera.hpp"
 #include "RigidBody3D.hpp"
 #include "SoftBody3D.hpp"
 #include "Player.hpp"
@@ -37,6 +38,7 @@ static glm::vec3 GetPlayerMovementForce(ES::Engine::Core &core)
 
 void Game::PlayerMovement(ES::Engine::Core &core)
 {
+    auto &camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
     auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
     auto &bodyInterface = physicsManager.GetPhysicsSystem().GetBodyInterface();
 
@@ -46,15 +48,19 @@ void Game::PlayerMovement(ES::Engine::Core &core)
         return;
     }
 
+    auto viewDir = camera.viewer.getViewDir();
+    force = glm::vec3(viewDir.x, 0.0f, viewDir.z) * force.z + glm::vec3(-viewDir.z, 0.0f, viewDir.x) * force.x;
+
     // TODO: only move if player is on the floor
     auto ApplyMovementForce = [&](auto &body, const Game::Player &player) {
         if (body == nullptr) {
             return;
         }
 
-        glm::vec3 walkForce(force.x * player.acceleration.x, 0.0f, force.z * player.acceleration.z);
+        force.x *= player.acceleration.x;
+        force.z *= player.acceleration.z;
 
-        bodyInterface.AddForce(body->GetID(), JPH::Vec3(walkForce.x, 0.0f, walkForce.z));
+        bodyInterface.AddForce(body->GetID(), JPH::Vec3(force.x, 0.0f, force.z));
         
         auto linearVelocity = body->GetLinearVelocity();
         linearVelocity.SetX(glm::clamp(linearVelocity.GetX(), -player.maxSpeed.x, player.maxSpeed.x));
