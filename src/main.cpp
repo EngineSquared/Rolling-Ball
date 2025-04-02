@@ -8,6 +8,8 @@
 #include "Window.hpp"
 #include "Camera.hpp"
 
+#include "player/SpawnPlayer.hpp"
+
 #include <iostream>
 
 // Jolt includes
@@ -27,74 +29,6 @@ using namespace JPH; // NOT RECOMMENDED
 using namespace JPH::literals;
 using namespace ES::Plugin;
 
-ES::Engine::Entity CreateSphere(ES::Engine::Core &core)
-{
-	// Create the settings for the collision volume (the shape).
-	// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-	constexpr float radius = .5f;
-
-	std::shared_ptr<SphereShapeSettings> sphere_shape_settings = std::make_shared<SphereShapeSettings>(radius);
-
-	// Create the shape
-	ES::Engine::Entity sphere = core.CreateEntity();
-	sphere.AddComponent<ES::Plugin::Object::Component::Transform>(core, glm::vec3(0.0f, 30.0f, 0.0f));
-	sphere.AddComponent<ES::Plugin::Physics::Component::RigidBody3D>(core, sphere_shape_settings, EMotionType::Dynamic, Physics::Utils::Layers::MOVING);
-
-	sphere.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "default");
-    sphere.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
-    sphere.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "sphere");
-
-    Object::Component::Mesh mesh;
-	{
-		// Generate a sphere
-		const int numSegments = 16;
-		const int numRings = 16;
-
-		// Generate vertices and normals
-
-		const float pi = glm::pi<float>();
-
-		for (int i = 0; i <= numRings; ++i) {
-			float phi = pi * (static_cast<float>(i) / numRings); // Latitude angle from 0 to pi
-
-			for (int j = 0; j <= numSegments; ++j) {
-				float theta = 2.0f * pi * (static_cast<float>(j) / numSegments); // Longitude angle from 0 to 2*pi
-
-				// Spherical coordinates
-				float x = radius * sin(phi) * cos(theta);
-				float y = radius * cos(phi);
-				float z = radius * sin(phi) * sin(theta);
-
-				mesh.vertices.push_back(glm::vec3(x, y, z));
-				mesh.normals.push_back(glm::normalize(glm::vec3(x, y, z)));
-			}
-		}
-
-		// Generate indices for triangle strips
-		for (int i = 0; i < numRings; ++i) {
-			for (int j = 0; j < numSegments; ++j) {
-				unsigned int i0 = i * (numSegments + 1) + j;
-				unsigned int i1 = (i + 1) * (numSegments + 1) + j;
-				unsigned int i2 = (i + 1) * (numSegments + 1) + (j + 1);
-				unsigned int i3 = i * (numSegments + 1) + (j + 1);
-
-				// // First triangle
-				mesh.indices.push_back(i0);
-				mesh.indices.push_back(i1);
-				mesh.indices.push_back(i2);
-
-				// // Second triangle
-				mesh.indices.push_back(i0);
-				mesh.indices.push_back(i2);
-				mesh.indices.push_back(i3);
-			}
-		}
-	}
-
-	sphere.AddComponent<ES::Plugin::Object::Component::Mesh>(core, mesh);
-
-	return sphere;
-}
 
 ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 {
@@ -229,37 +163,26 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 	return floor;
 }
 
-void Setup(ES::Engine::Core &core)
-{
-	// Next we can create a rigid body to serve as the floor, we make a large box
-	ES::Engine::Entity floor = CreateFloor(core);
-
-	// Now create a dynamic body to bounce on the floor
-	ES::Engine::Entity sphere = CreateSphere(core);
-
-	// Now that we know which entity is the sphere, we can create its linked system
-	// Note that this is for testing purposes only
-	// core.RegisterSystem(InitSphereSystem{ sphere });
-
-	core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
-	// core.RegisterSystem(PrintSphereInfoSystem{ sphere });
-
-	// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection performance (it's pointless here because we only have 2 bodies).
-	// You should definitely not call this every frame or when e.g. streaming in a new level section as it is an expensive operation.
-	// Instead insert all new objects in batches instead of 1 at a time to keep the broad phase efficient.
-	core.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
-
-	// Now we're ready to simulate the body
-	core.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(10);
-}
-
 int main(void)
 {
     ES::Engine::Core core;
 
 	core.AddPlugins<ES::Plugin::OpenGL::Plugin, ES::Plugin::Physics::Plugin>();
 
-	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Setup);
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&core](ES::Engine::Core &core) {
+		auto floor = CreateFloor(core);
+	});
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::SpawnPlayer);
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&core](ES::Engine::Core &core) {
+		// TODO: define somewhere else in player
+		auto camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
+		camera.viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
+
+		core.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
+		core.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(10);
+	});
 
 	core.RunCore();
 
