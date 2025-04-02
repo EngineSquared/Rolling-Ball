@@ -49,7 +49,6 @@ static void ApplyJumpImpulse(ES::Engine::Core &core, JPH::Body *body, Game::Play
 
     if (input.IsKeyPressed(GLFW_KEY_SPACE) && PlayerTouchesTerrain(core, body->GetID())) {
         bodyInterface.AddImpulse(body->GetID(), JPH::Vec3(0.0f, player.jumpImpulse, 0.0f));
-        printf("Jump\n");
     }
 }
 
