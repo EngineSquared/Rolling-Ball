@@ -8,9 +8,11 @@
 #include "Window.hpp"
 #include "Camera.hpp"
 #include "FixedTimeUpdate.hpp"
+#include "InputManager.hpp"
 
 #include "player/SpawnPlayer.hpp"
 #include "player/PointCameraToPlayer.hpp"
+#include "player/PlayerMovement.hpp"
 
 #include <iostream>
 
@@ -171,6 +173,8 @@ int main(void)
 
 	core.AddPlugins<ES::Plugin::OpenGL::Plugin, ES::Plugin::Physics::Plugin>();
 
+	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(std::move(ES::Plugin::Input::Resource::InputManager()));
+
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&core](ES::Engine::Core &core) {
 		auto floor = CreateFloor(core);
 	});
@@ -184,7 +188,9 @@ int main(void)
 		core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
 	});
 
-	core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(Game::PointCameraToPlayer);
+	core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+		Game::PointCameraToPlayer, Game::PlayerMovement
+	);
 
 	core.RunCore();
 
