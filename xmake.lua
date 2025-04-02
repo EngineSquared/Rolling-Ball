@@ -20,6 +20,9 @@ target("RollingBall")
     add_files("src/**.cpp")
     add_includedirs("$(projectdir)/src/")
 
+    add_includedirs("$(projectdir)/src/player")
+    add_includedirs("$(projectdir)/src/terrain")
+
     add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics")
 
     set_rundir("$(projectdir)")
