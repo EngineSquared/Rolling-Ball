@@ -13,6 +13,7 @@
 #include "player/SpawnPlayer.hpp"
 #include "player/PointCameraToPlayer.hpp"
 #include "player/PlayerMovement.hpp"
+#include "player/PlayerJump.hpp"
 
 #include <iostream>
 
@@ -191,6 +192,9 @@ int main(void)
 	core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
 		Game::PointCameraToPlayer, Game::PlayerMovement
 	);
+	core.RegisterSystem<ES::Engine::Scheduler::Update>(Game::PlayerJump);
+
+	
 
 	core.RunCore();
 
