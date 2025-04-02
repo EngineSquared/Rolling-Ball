@@ -1,9 +1,5 @@
 #include "PlayerMovement.hpp"
 
-// TODO: the "Body" include should be in ESQ, not here
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/Body/Body.h>
-
 #include "Camera.hpp"
 #include "RigidBody3D.hpp"
 #include "SoftBody3D.hpp"
