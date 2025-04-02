@@ -10,12 +10,12 @@
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
 
-#include "player/SpawnPlayer.hpp"
-#include "player/PointCameraToPlayer.hpp"
-#include "player/PlayerMovement.hpp"
-#include "player/PlayerJump.hpp"
+#include "SpawnPlayer.hpp"
+#include "PointCameraToPlayer.hpp"
+#include "PlayerMovement.hpp"
+#include "PlayerJump.hpp"
 
-#include "terrain/Terrain.hpp"
+#include "Terrain.hpp"
 
 #include <iostream>
 

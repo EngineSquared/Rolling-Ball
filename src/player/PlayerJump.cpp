@@ -11,8 +11,7 @@
 #include "InputManager.hpp"
 #include "PhysicsManager.hpp"
 
-// TODO: this is dirty
-#include "../terrain/Terrain.hpp"
+#include "Terrain.hpp"
 
 static bool PlayerTouchesTerrain(ES::Engine::Core &core, const JPH::BodyID &player)
 {
