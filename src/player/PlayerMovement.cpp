@@ -52,7 +52,6 @@ void Game::PlayerMovement(ES::Engine::Core &core)
     auto viewDir = camera.viewer.getViewDir();
     force = glm::vec3(viewDir.x, 0.0f, viewDir.z) * force.z + glm::vec3(-viewDir.z, 0.0f, viewDir.x) * force.x;
 
-    // TODO: only move if player is on the floor
     auto ApplyMovementForce = [&](auto &body, Game::Player &player) {
         if (body == nullptr) {
             return;
@@ -62,12 +61,6 @@ void Game::PlayerMovement(ES::Engine::Core &core)
         force.z *= player.acceleration.z;
 
         bodyInterface.AddForce(body->GetID(), JPH::Vec3(force.x, 0.0f, force.z));
-
-        if (player.CanJump() && input.IsKeyPressed(GLFW_KEY_SPACE)) {
-            bodyInterface.AddImpulse(body->GetID(), JPH::Vec3(0.0f, player.jumpImpulse, 0.0f));
-            player.Jump();
-            printf("Jump\n");
-        }
         
         auto linearVelocity = body->GetLinearVelocity();
         linearVelocity.SetX(glm::clamp(linearVelocity.GetX(), -player.maxSpeed.x, player.maxSpeed.x));

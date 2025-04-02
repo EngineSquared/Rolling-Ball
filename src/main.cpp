@@ -15,6 +15,8 @@
 #include "player/PlayerMovement.hpp"
 #include "player/PlayerJump.hpp"
 
+#include "terrain/Terrain.hpp"
+
 #include <iostream>
 
 // Jolt includes
@@ -164,6 +166,7 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 	}
 
 	floor.AddComponent<ES::Plugin::Object::Component::Mesh>(core, mesh);
+	floor.AddComponent<Game::Terrain>(core);
 
 	return floor;
 }
