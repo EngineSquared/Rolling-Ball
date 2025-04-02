@@ -3,6 +3,8 @@
 #include "Engine.hpp"
 #include "Entity.hpp"
 #include "Transform.hpp"
+#include "PlayerTag.hpp"
+#include "Camera.hpp"
 
 #include "JoltPhysics.hpp"
 #include "OpenGL.hpp"
@@ -101,4 +103,9 @@ void Game::SpawnPlayer(ES::Engine::Core &core)
     player.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "default");
     player.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
     player.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "player");
+    player.AddComponent<Game::PlayerTag>(core);
+
+    // Maybe this should be split in different systems
+    auto &camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
+    camera.viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
 }

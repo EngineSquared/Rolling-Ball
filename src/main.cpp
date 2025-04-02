@@ -7,8 +7,10 @@
 #include "OpenGL.hpp"
 #include "Window.hpp"
 #include "Camera.hpp"
+#include "FixedTimeUpdate.hpp"
 
 #include "player/SpawnPlayer.hpp"
+#include "player/PointCameraToPlayer.hpp"
 
 #include <iostream>
 
@@ -176,13 +178,13 @@ int main(void)
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::SpawnPlayer);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&core](ES::Engine::Core &core) {
-		// TODO: define somewhere else in player
-		auto camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
-		camera.viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
-
 		core.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
-		core.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(10);
+		core.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(2);
+
+		core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
 	});
+
+	core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(Game::PointCameraToPlayer);
 
 	core.RunCore();
 
