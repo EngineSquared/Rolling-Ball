@@ -8,6 +8,15 @@
 #include "Window.hpp"
 #include "Camera.hpp"
 #include "Light.hpp"
+#include "FixedTimeUpdate.hpp"
+#include "InputManager.hpp"
+
+#include "SpawnPlayer.hpp"
+#include "PointCameraToPlayer.hpp"
+#include "PlayerMovement.hpp"
+#include "PlayerJump.hpp"
+
+#include "Terrain.hpp"
 
 #include <iostream>
 
@@ -227,8 +236,9 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 			21, 23, 22,
 		};
 	}
-
 	floor.AddComponent<Object::Component::Mesh>(core, mesh);
+	floor.AddComponent<Game::Terrain>(core);
+
 
 	return floor;
 }
@@ -290,39 +300,40 @@ void LoadNormalShader(ES::Engine::Core &core)
     sp.disable();
 }
 
-void Setup(ES::Engine::Core &core)
-{
-	// Next we can create a rigid body to serve as the floor, we make a large box
-	ES::Engine::Entity floor = CreateFloor(core);
-
-	// Now create a dynamic body to bounce on the floor
-	ES::Engine::Entity sphere = CreateSphere(core);
-
-	// Now that we know which entity is the sphere, we can create its linked system
-	// Note that this is for testing purposes only
-	// core.RegisterSystem(InitSphereSystem{ sphere });
-
-	core.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
-	// core.RegisterSystem(PrintSphereInfoSystem{ sphere });
-
-	// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection performance (it's pointless here because we only have 2 bodies).
-	// You should definitely not call this every frame or when e.g. streaming in a new level section as it is an expensive operation.
-	// Instead insert all new objects in batches instead of 1 at a time to keep the broad phase efficient.
-	core.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
-
-	// Now we're ready to simulate the body
-	core.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(10);
-}
-
 int main(void)
 {
     ES::Engine::Core core;
 
 	core.AddPlugins<OpenGL::Plugin, Physics::Plugin>();
 
+	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(std::move(ES::Plugin::Input::Resource::InputManager()));
+
+	core.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
+	// core.RegisterSystem(PrintSphereInfoSystem{ sphere });
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
+		auto floor = CreateFloor(core);
+	});
+
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::SpawnPlayer);
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
+		core.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
+		core.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(2);
+
+		core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
+	});
+
+	core.AddPlugins<OpenGL::Plugin, Physics::Plugin>();
+
 	// WARNING: adding systems inside a system will not work properly because it will not be call in the current frame / run of schedulers
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(LoadNormalShader);
-	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Setup);
+	core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+		Game::PointCameraToPlayer, Game::PlayerMovement
+	);
+	core.RegisterSystem<ES::Engine::Scheduler::Update>(Game::PlayerJump);
+
 
 	core.RunCore();
 
