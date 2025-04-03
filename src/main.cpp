@@ -40,75 +40,6 @@ using namespace JPH; // NOT RECOMMENDED
 using namespace JPH::literals;
 using namespace ES::Plugin;
 
-ES::Engine::Entity CreateSphere(ES::Engine::Core &core)
-{
-	// Create the settings for the collision volume (the shape).
-	// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-	constexpr float radius = .5f;
-
-	std::shared_ptr<SphereShapeSettings> sphere_shape_settings = std::make_shared<SphereShapeSettings>(radius);
-
-	// Create the shape
-	ES::Engine::Entity sphere = core.CreateEntity();
-	sphere.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f, 30.0f, 0.0f));
-	sphere.AddComponent<Physics::Component::RigidBody3D>(core, sphere_shape_settings, EMotionType::Dynamic, Physics::Utils::Layers::MOVING);
-
-	sphere.AddComponent<OpenGL::Component::ShaderHandle>(core, "normal");
-    sphere.AddComponent<OpenGL::Component::MaterialHandle>(core, "default");
-    sphere.AddComponent<OpenGL::Component::ModelHandle>(core, "sphere");
-
-    Object::Component::Mesh mesh;
-	{
-		// Generate a sphere
-		const int numSegments = 16;
-		const int numRings = 16;
-
-		// Generate vertices and normals
-
-		const float pi = glm::pi<float>();
-
-		for (int i = 0; i <= numRings; ++i) {
-			float phi = pi * (static_cast<float>(i) / numRings); // Latitude angle from 0 to pi
-
-			for (int j = 0; j <= numSegments; ++j) {
-				float theta = 2.0f * pi * (static_cast<float>(j) / numSegments); // Longitude angle from 0 to 2*pi
-
-				// Spherical coordinates
-				float x = radius * sin(phi) * cos(theta);
-				float y = radius * cos(phi);
-				float z = radius * sin(phi) * sin(theta);
-
-				mesh.vertices.push_back(glm::vec3(x, y, z));
-				mesh.normals.push_back(glm::normalize(glm::vec3(x, y, z)));
-			}
-		}
-
-		// Generate indices for triangle strips
-		for (int i = 0; i < numRings; ++i) {
-			for (int j = 0; j < numSegments; ++j) {
-				unsigned int i0 = i * (numSegments + 1) + j;
-				unsigned int i1 = (i + 1) * (numSegments + 1) + j;
-				unsigned int i2 = (i + 1) * (numSegments + 1) + (j + 1);
-				unsigned int i3 = i * (numSegments + 1) + (j + 1);
-
-				// // First triangle
-				mesh.indices.push_back(i0);
-				mesh.indices.push_back(i1);
-				mesh.indices.push_back(i2);
-
-				// // Second triangle
-				mesh.indices.push_back(i0);
-				mesh.indices.push_back(i2);
-				mesh.indices.push_back(i3);
-			}
-		}
-	}
-
-	sphere.AddComponent<Object::Component::Mesh>(core, mesh);
-
-	return sphere;
-}
-
 ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 {
 	glm::vec3 floor_position = glm::vec3(0.0f, -8.0f, 0.0f);
@@ -245,6 +176,7 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 
 void LoadNormalShader(ES::Engine::Core &core)
 {
+	// This "using" allow to use "_hs" compile time hashing for strings
 	using namespace entt;
 	const std::string vertexShader = "asset/shader/normal/normal.vs";
 	const std::string fragmentShader = "asset/shader/normal/normal.fs";
@@ -308,8 +240,9 @@ int main(void)
 
 	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(std::move(ES::Plugin::Input::Resource::InputManager()));
 
-	core.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
-	// core.RegisterSystem(PrintSphereInfoSystem{ sphere });
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
+		core.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
+	});
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
 		auto floor = CreateFloor(core);
@@ -324,8 +257,6 @@ int main(void)
 
 		core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
 	});
-
-	core.AddPlugins<OpenGL::Plugin, Physics::Plugin>();
 
 	// WARNING: adding systems inside a system will not work properly because it will not be call in the current frame / run of schedulers
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(LoadNormalShader);
