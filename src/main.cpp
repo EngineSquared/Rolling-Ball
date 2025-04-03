@@ -7,6 +7,7 @@
 #include "OpenGL.hpp"
 #include "Window.hpp"
 #include "Camera.hpp"
+#include "Light.hpp"
 
 #include <iostream>
 
@@ -21,6 +22,9 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace JPH; // NOT RECOMMENDED
 
@@ -37,12 +41,12 @@ ES::Engine::Entity CreateSphere(ES::Engine::Core &core)
 
 	// Create the shape
 	ES::Engine::Entity sphere = core.CreateEntity();
-	sphere.AddComponent<ES::Plugin::Object::Component::Transform>(core, glm::vec3(0.0f, 30.0f, 0.0f));
-	sphere.AddComponent<ES::Plugin::Physics::Component::RigidBody3D>(core, sphere_shape_settings, EMotionType::Dynamic, Physics::Utils::Layers::MOVING);
+	sphere.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f, 30.0f, 0.0f));
+	sphere.AddComponent<Physics::Component::RigidBody3D>(core, sphere_shape_settings, EMotionType::Dynamic, Physics::Utils::Layers::MOVING);
 
-	sphere.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "default");
-    sphere.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
-    sphere.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "sphere");
+	sphere.AddComponent<OpenGL::Component::ShaderHandle>(core, "normal");
+    sphere.AddComponent<OpenGL::Component::MaterialHandle>(core, "default");
+    sphere.AddComponent<OpenGL::Component::ModelHandle>(core, "sphere");
 
     Object::Component::Mesh mesh;
 	{
@@ -91,7 +95,7 @@ ES::Engine::Entity CreateSphere(ES::Engine::Core &core)
 		}
 	}
 
-	sphere.AddComponent<ES::Plugin::Object::Component::Mesh>(core, mesh);
+	sphere.AddComponent<Object::Component::Mesh>(core, mesh);
 
 	return sphere;
 }
@@ -109,13 +113,13 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 	std::shared_ptr<BoxShapeSettings> floor_shape_settings = std::make_shared<BoxShapeSettings>(floor_size);
 	ES::Engine::Entity floor = core.CreateEntity();
 
-	floor.AddComponent<ES::Plugin::Object::Component::Transform>(core, floor_position, floor_scale, floor_rotation);
-	floor.AddComponent<ES::Plugin::Physics::Component::RigidBody3D>(core, floor_shape_settings, EMotionType::Static, Physics::Utils::Layers::NON_MOVING);
+	floor.AddComponent<Object::Component::Transform>(core, floor_position, floor_scale, floor_rotation);
+	floor.AddComponent<Physics::Component::RigidBody3D>(core, floor_shape_settings, EMotionType::Static, Physics::Utils::Layers::NON_MOVING);
 
 	// Add a mesh to it for rendering
-	floor.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "default");
-    floor.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
-    floor.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "floor");
+	floor.AddComponent<OpenGL::Component::ShaderHandle>(core, "default");
+    floor.AddComponent<OpenGL::Component::MaterialHandle>(core, "default");
+    floor.AddComponent<OpenGL::Component::ModelHandle>(core, "floor");
 
     Object::Component::Mesh mesh;
 	{
@@ -224,9 +228,66 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 		};
 	}
 
-	floor.AddComponent<ES::Plugin::Object::Component::Mesh>(core, mesh);
+	floor.AddComponent<Object::Component::Mesh>(core, mesh);
 
 	return floor;
+}
+
+void LoadNormalShader(ES::Engine::Core &core)
+{
+	using namespace entt;
+	const std::string vertexShader = "asset/shader/normal/normal.vs";
+	const std::string fragmentShader = "asset/shader/normal/normal.fs";
+	auto &shaderManager = core.GetResource<OpenGL::Resource::ShaderManager>();
+    OpenGL::Utils::ShaderProgram &sp = shaderManager.Add("normal"_hs);
+    sp.Create();
+    sp.initFromFiles(vertexShader, fragmentShader);
+	sp.addUniform("MVP");
+    sp.addUniform("ModelMatrix");
+    sp.addUniform("NormalMatrix");
+
+    for (int i = 0; i < 5; i++)
+    {
+        sp.addUniform(fmt::format("Light[{}].Position", i));
+        sp.addUniform(fmt::format("Light[{}].Intensity", i));
+    }
+    sp.addUniform("Material.Ka");
+    sp.addUniform("Material.Kd");
+    sp.addUniform("Material.Ks");
+    sp.addUniform("Material.Shiness");
+
+    sp.addUniform("CamPos");
+
+	sp.use();
+    glUniform3fv(sp.uniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
+	sp.disable();
+
+    std::array<OpenGL::Utils::Light, 5> light = {
+        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.0f, 0.8f, 0.8f)},
+        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.0f, 0.0f, 0.8f)},
+        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.8f, 0.0f, 0.0f)},
+        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.0f, 0.8f, 0.0f)},
+        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.8f, 0.8f, 0.8f)}
+    };
+
+    float nbr_lights = 5.f;
+    float scale = 2.f * glm::pi<float>() / nbr_lights;
+
+    light[0].position = glm::vec4(5.f * cosf(scale * 0.f), 5.f, 5.f * sinf(scale * 0.f), 1.f);
+    light[1].position = glm::vec4(5.f * cosf(scale * 1.f), 5.f, 5.f * sinf(scale * 1.f), 1.f);
+    light[2].position = glm::vec4(5.f * cosf(scale * 2.f), 5.f, 5.f * sinf(scale * 2.f), 1.f);
+    light[3].position = glm::vec4(5.f * cosf(scale * 3.f), 5.f, 5.f * sinf(scale * 3.f), 1.f);
+    light[4].position = glm::vec4(5.f * cosf(scale * 4.f), 5.f, 5.f * sinf(scale * 4.f), 1.f);
+
+    sp.use();
+    for (int i = 0; i < 5; i++)
+    {
+        glUniform4fv(sp.uniform(fmt::format("Light[{}].Position", i).c_str()), 1,
+                     glm::value_ptr(light[i].position));
+        glUniform3fv(sp.uniform(fmt::format("Light[{}].Intensity", i).c_str()), 1,
+                     glm::value_ptr(light[i].intensity));
+    }
+    sp.disable();
 }
 
 void Setup(ES::Engine::Core &core)
@@ -241,7 +302,7 @@ void Setup(ES::Engine::Core &core)
 	// Note that this is for testing purposes only
 	// core.RegisterSystem(InitSphereSystem{ sphere });
 
-	core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
+	core.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
 	// core.RegisterSystem(PrintSphereInfoSystem{ sphere });
 
 	// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection performance (it's pointless here because we only have 2 bodies).
@@ -257,13 +318,15 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<ES::Plugin::OpenGL::Plugin, ES::Plugin::Physics::Plugin>();
+	core.AddPlugins<OpenGL::Plugin, Physics::Plugin>();
 
+	// WARNING: adding systems inside a system will not work properly because it will not be call in the current frame / run of schedulers
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(LoadNormalShader);
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Setup);
 
 	core.RunCore();
 
-    glfwDestroyWindow(core.GetResource<ES::Plugin::Window::Resource::Window>().GetGLFWWindow());
+    glfwDestroyWindow(core.GetResource<Window::Resource::Window>().GetGLFWWindow());
     glfwTerminate();
 
     return 0;
