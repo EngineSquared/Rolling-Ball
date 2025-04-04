@@ -170,6 +170,9 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 
 	return floor;
 }
+struct Name {
+	std::string value;
+};
 
 int main(void)
 {
@@ -178,6 +181,16 @@ int main(void)
 	core.AddPlugins<ES::Plugin::OpenGL::Plugin, ES::Plugin::Physics::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(std::move(ES::Plugin::Input::Resource::InputManager()));
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
+		auto sprite = core.CreateEntity();
+		sprite.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core);
+		sprite.AddComponent<Name>(core, "testN1");
+		// add transform component
+		sprite.AddComponent<ES::Plugin::Object::Component::Transform>(core);
+		sprite.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
+		sprite.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "testN1");
+	});
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &core) {
 		auto floor = CreateFloor(core);
