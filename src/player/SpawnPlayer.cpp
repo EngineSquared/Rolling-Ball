@@ -100,7 +100,7 @@ void Game::SpawnPlayer(ES::Engine::Core &core)
 
     auto player = CreateSphere(core, false, 2, initialPosition);
 
-    player.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "default");
+    player.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "normal");
     player.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
     player.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "player");
     player.AddComponent<Game::Player>(core);
