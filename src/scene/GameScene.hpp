@@ -14,54 +14,6 @@
 
 using namespace ES::Plugin;
 
-static void UpdateButtonTextureColor(ES::Plugin::UI::Component::Button &button,
-	ES::Plugin::OpenGL::Component::Sprite &sprite)
-{
-	auto const &displayType = std::get<ES::Plugin::UI::Component::DisplayType::TintColor>(button.displayType);
-	switch (button.state)
-	{
-		using enum ES::Plugin::UI::Component::Button::State;
-		case Normal: sprite.color = displayType.normalColor; break;
-		case Hover: sprite.color = displayType.hoverColor; break;
-		case Pressed: sprite.color = displayType.pressedColor; break;
-	}
-}
-
-static void UpdateButtonTextureImage(ES::Plugin::UI::Component::Button &button,
-	ES::Plugin::OpenGL::Component::Sprite &sprite)
-{
-	// TODO: Implement texture usage for image button
-	// auto const &displayType = std::get<ES::Plugin::UI::Component::DisplayType::Image>(button.displayType);
-	// switch (button.state)
-	// {
-	// 	using enum ES::Plugin::UI::Component::Button::State;
-	// 	// case Normal: sprite.textureID = displayType.normalImageID; break;
-	// 	// case Hover: sprite.textureID = displayType.hoverImageID; break;
-	// 	// case Pressed: sprite.textureID = displayType.pressedImageID; break;
-	// }
-}
-
-static void UpdateButtonTexture(ES::Engine::Core &core)
-{
-	auto view = core.GetRegistry()
-		.view<ES::Plugin::UI::Component::Button, ES::Plugin::OpenGL::Component::Sprite,
-	ES::Plugin::Tools::HasChanged<ES::Plugin::UI::Component::Button>>();
-	for (auto entity : view)
-	{
-		auto &button = view.get<ES::Plugin::UI::Component::Button>(entity);
-		auto &sprite = view.get<ES::Plugin::OpenGL::Component::Sprite>(entity);
-		if (std::holds_alternative<ES::Plugin::UI::Component::DisplayType::TintColor>(button.displayType))
-		{
-			UpdateButtonTextureColor(button, sprite);
-		}
-		else if (std::holds_alternative<ES::Plugin::UI::Component::DisplayType::Image>(button.displayType))
-		{
-			UpdateButtonTextureImage(button, sprite);
-		}
-	}
-}
-
-
 static ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 {
 	glm::vec3 floor_position = glm::vec3(0.0f, -8.0f, 0.0f);
@@ -199,7 +151,6 @@ static ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 namespace Game
 {
     class GameScene : public ES::Plugin::Scene::Utils::AScene {
-        inline static int _numScenes = 0;
     
       public:
         GameScene() : ES::Plugin::Scene::Utils::AScene() {}
@@ -209,36 +160,16 @@ namespace Game
         {
             CreateFloor(core);
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
-                Game::PlayerJump,
-				ES::Plugin::UI::System::ButtonClick,
-				ES::Engine::Entity::RemoveTemporaryComponents,
-				ES::Plugin::UI::System::UpdateButtonState,
-				UpdateButtonTexture
+                Game::PlayerJump
             );
             core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
                 Game::PointCameraToPlayer,
                 Game::PlayerMovement
             );
             Game::SpawnPlayer(core);
-			auto buttonEntity = core.CreateEntity();
-			buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
-			buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "buttonTest");
-			buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core);
-			
-
-			buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
-			buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(32.f, 32.f));
-			auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
-			buttonComp.onClick = [&](ES::Engine::Core &core) {
-				ES::Utils::Log::Info("Button clicked!");
-			};
-			buttonComp.displayType =
-				ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::WHITE_COLOR,
-																  .hoverColor   = ES::Plugin::Colors::Utils::GRAY_COLOR,
-																  .pressedColor = ES::Plugin::Colors::Utils::DARKGRAY_COLOR};
         }
     
-        void _onDestroy(ES::Engine::Core &core) final
+        void _onDestroy(ES::Engine::Core &) final
         {
             
         }
