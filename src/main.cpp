@@ -19,6 +19,7 @@
 #include "Terrain.hpp"
 
 #include "GameScene.hpp"
+#include "MainMenu.hpp"
 
 #include <iostream>
 
@@ -41,6 +42,54 @@ using namespace JPH; // NOT RECOMMENDED
 
 using namespace JPH::literals;
 using namespace ES::Plugin;
+
+static void UpdateButtonTextureColor(ES::Plugin::UI::Component::Button &button,
+	ES::Plugin::OpenGL::Component::Sprite &sprite)
+{
+	auto const &displayType = std::get<ES::Plugin::UI::Component::DisplayType::TintColor>(button.displayType);
+	switch (button.state)
+	{
+		using enum ES::Plugin::UI::Component::Button::State;
+		case Normal: sprite.color = displayType.normalColor; break;
+		case Hover: sprite.color = displayType.hoverColor; break;
+		case Pressed: sprite.color = displayType.pressedColor; break;
+	}
+}
+
+static void UpdateButtonTextureImage(
+    [[maybe_unused]] ES::Plugin::UI::Component::Button &button,
+	[[maybe_unused]] ES::Plugin::OpenGL::Component::Sprite &sprite)
+{
+	// TODO: Implement texture usage for image button
+	// auto const &displayType = std::get<ES::Plugin::UI::Component::DisplayType::Image>(button.displayType);
+	// switch (button.state)
+	// {
+	// 	using enum ES::Plugin::UI::Component::Button::State;
+	// 	// case Normal: sprite.textureID = displayType.normalImageID; break;
+	// 	// case Hover: sprite.textureID = displayType.hoverImageID; break;
+	// 	// case Pressed: sprite.textureID = displayType.pressedImageID; break;
+	// }
+}
+
+static void UpdateButtonTexture(ES::Engine::Core &core)
+{
+	auto view = core.GetRegistry()
+		.view<ES::Plugin::UI::Component::Button, ES::Plugin::OpenGL::Component::Sprite,
+	ES::Plugin::Tools::HasChanged<ES::Plugin::UI::Component::Button>>();
+	for (auto entity : view)
+	{
+		auto &button = view.get<ES::Plugin::UI::Component::Button>(entity);
+		auto &sprite = view.get<ES::Plugin::OpenGL::Component::Sprite>(entity);
+		if (std::holds_alternative<ES::Plugin::UI::Component::DisplayType::TintColor>(button.displayType))
+		{
+			UpdateButtonTextureColor(button, sprite);
+		}
+		else if (std::holds_alternative<ES::Plugin::UI::Component::DisplayType::Image>(button.displayType))
+		{
+			UpdateButtonTextureImage(button, sprite);
+		}
+	}
+}
 
 void LoadNormalShader(ES::Engine::Core &core)
 {
@@ -111,7 +160,8 @@ int main(void)
 	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(ES::Plugin::Input::Resource::InputManager());
 	
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::GameScene>("game");
-	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game");
+    core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("main_menu");
+	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(
 		[](ES::Engine::Core &c) {
@@ -126,7 +176,11 @@ int main(void)
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Update>(
-		ES::Plugin::Scene::System::UpdateScene
+		ES::Plugin::Scene::System::UpdateScene,
+        ES::Plugin::UI::System::ButtonClick,
+        ES::Engine::Entity::RemoveTemporaryComponents,
+        ES::Plugin::UI::System::UpdateButtonState,
+        UpdateButtonTexture
 	);
 
 

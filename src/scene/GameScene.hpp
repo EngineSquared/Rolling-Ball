@@ -5,6 +5,9 @@
 #include "PointCameraToPlayer.hpp"
 #include "SpawnPlayer.hpp"
 #include "Core.hpp"
+#include "UI.hpp"
+#include "HasChanged.hpp"
+#include <variant>
 
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
@@ -148,7 +151,6 @@ static ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 namespace Game
 {
     class GameScene : public ES::Plugin::Scene::Utils::AScene {
-        inline static int _numScenes = 0;
     
       public:
         GameScene() : ES::Plugin::Scene::Utils::AScene() {}
@@ -167,7 +169,7 @@ namespace Game
             Game::SpawnPlayer(core);
         }
     
-        void _onDestroy(ES::Engine::Core &core) final
+        void _onDestroy(ES::Engine::Core &) final
         {
             
         }
