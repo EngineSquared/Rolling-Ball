@@ -27,6 +27,15 @@ Game::TerrainType Game::GetRandomTerrainType(std::mt19937 &rng)
     return static_cast<Game::TerrainType>(dist(rng));
 }
 
+void Game::GenerateAndInstantiateTerrain(ES::Engine::Core &core) {
+	Game::Terrain terrain;
+
+    GenerateTerrain(terrain);
+    for (const auto &piece : terrain.pieces) {
+        ES::Engine::Entity entity = Game::CreateTerrainPiece(core, piece);
+    }
+}
+
 void Game::GenerateTerrain(Game::Terrain &terrain)
 {
     for (int i = 0; i < terrain.segmentCount; ++i)
@@ -38,7 +47,6 @@ void Game::GenerateTerrain(Game::Terrain &terrain)
         piece.position = terrain.segmentsPositionOffset + terrain.segmentsGapPositionOffset * glm::vec3(static_cast<float>(i));
         piece.scale = terrain.segmentsScale;
         piece.rotationAngle = terrain.segmentsRotation;
-        std::cout << i << " " << piece.position.x << " " << piece.position.y << " " << piece.position.z << std::endl;
         terrain.pieces.push_back(piece);
     }
 }
