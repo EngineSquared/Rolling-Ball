@@ -10,8 +10,7 @@ namespace Game {
         Ramp,
         CurveLeft,
         CurveRight,
-        Wave,
-        Gap
+        Wave
     };
 
     struct TerrainPiece {
@@ -27,8 +26,8 @@ namespace Game {
 
         int segmentCount = 10;
         glm::vec3 segmentsPositionOffset{0.0f, 0.0f, 0.0f};
-        glm::vec3 segmentsGapPositionOffset{0.0f, 0.0f, 40.0f};
-        glm::vec3 segmentsScale{4.0f, 4.0f, 4.0f};
+        glm::vec3 segmentsGapPositionOffset{0.0f, 0.0f, 20.0f};
+        glm::vec3 segmentsScale{2.0f, 2.0f, 2.0f};
         glm::quat segmentsRotation{0.0f, 0.7071f, 0.0f, 0.7071f};
 
         // Random seed

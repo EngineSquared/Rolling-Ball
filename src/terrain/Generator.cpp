@@ -57,11 +57,6 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
 
     terrainEntity.AddComponent<Object::Component::Transform>(core, piece.position, piece.scale, piece.rotationAngle);
 
-    if (piece.type == TerrainType::Gap)
-    {
-        return ES::Engine::Entity();
-    }
-
     terrainEntity.AddComponent<OpenGL::Component::ShaderHandle>(core, "default");
     terrainEntity.AddComponent<OpenGL::Component::MaterialHandle>(core, "default");
 
