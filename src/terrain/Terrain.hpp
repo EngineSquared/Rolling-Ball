@@ -10,7 +10,8 @@ namespace Game {
         Ramp,
         CurveLeft,
         CurveRight,
-        Wave
+        Wave,
+        Finish
     };
 
     struct TerrainPiece {

@@ -23,7 +23,7 @@ using namespace ES::Plugin;
 
 Game::TerrainType Game::GetRandomTerrainType(std::mt19937 &rng)
 {
-    std::uniform_int_distribution<int> dist(0, 5);
+    std::uniform_int_distribution<int> dist(0, 4);
     return static_cast<Game::TerrainType>(dist(rng));
 }
 
@@ -38,9 +38,11 @@ void Game::GenerateAndInstantiateTerrain(ES::Engine::Core &core) {
 
 void Game::GenerateTerrain(Game::Terrain &terrain)
 {
-    for (int i = 0; i < terrain.segmentCount; ++i)
+    for (int i = 0; i < terrain.segmentCount + 1; ++i)
     {
         auto type = GetRandomTerrainType(terrain.rng);
+        if (i == terrain.segmentCount)
+            type = Game::TerrainType::Finish;
 
         Game::TerrainPiece piece;
         piece.type = type;
@@ -78,6 +80,9 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
     case TerrainType::Wave:
         modelName = "wave";
         break;
+    case TerrainType::Finish:
+        modelName= "Finish";
+        break;
     default:
         modelName = "default";
         break;
@@ -95,6 +100,7 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
     else if (piece.type == TerrainType::CurveLeft) modelPath = "asset/models/curve_left.obj";
     else if (piece.type == TerrainType::CurveRight) modelPath = "asset/models/curve_right.obj";
     else if (piece.type == TerrainType::Wave) modelPath = "asset/models/wave.obj";
+    else if (piece.type == TerrainType::Finish) modelPath = "asset/models/finish.obj";
     else modelPath = "asset/models/straight.obj";
 
     if (ES::Plugin::Object::Resource::OBJLoader::loadModel(modelPath, vertices, normals, texCoords, indices)) {
