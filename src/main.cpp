@@ -16,7 +16,8 @@
 #include "PlayerMovement.hpp"
 #include "PlayerJump.hpp"
 
-#include "Terrain.hpp"
+// #include "Terrain.hpp"
+#include "Generator.hpp"
 
 #include "GameScene.hpp"
 #include "MainMenu.hpp"
@@ -163,7 +164,7 @@ int main(void)
     core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("main_menu");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
 
-	core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
 		[](ES::Engine::Core &c) {
 			c.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
 		},
@@ -182,7 +183,6 @@ int main(void)
         ES::Plugin::UI::System::UpdateButtonState,
         UpdateButtonTexture
 	);
-
 
 	core.RunCore();
 
