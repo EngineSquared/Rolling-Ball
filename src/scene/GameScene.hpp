@@ -2,6 +2,7 @@
 
 #include "PlayerJump.hpp"
 #include "PlayerMovement.hpp"
+#include "PlayerEvents.hpp"
 #include "PointCameraToPlayer.hpp"
 #include "SpawnPlayer.hpp"
 #include "Core.hpp"
@@ -28,6 +29,9 @@ namespace Game
 			GenerateAndInstantiateTerrain(core);
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
                 Game::PlayerJump
+            );
+            core.RegisterSystem<ES::Engine::Scheduler::Update>(
+                Game::PlayerEvents
             );
             core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
                 Game::PointCameraToPlayer,
