@@ -3,5 +3,5 @@
 #include "Core.hpp"
 
 namespace Game {
-    void SpawnPlayer(ES::Engine::Core &core);
+    ES::Engine::Entity SpawnPlayer(ES::Engine::Core &core);
 }

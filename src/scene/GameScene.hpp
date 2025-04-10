@@ -8,6 +8,7 @@
 #include "Core.hpp"
 #include "UI.hpp"
 #include "HasChanged.hpp"
+#include "Player.hpp"
 #include "Generator.hpp"
 #include <variant>
 
@@ -26,7 +27,8 @@ namespace Game
     protected:
         void _onCreate(ES::Engine::Core &core) final
         {
-			GenerateAndInstantiateTerrain(core);
+			std::vector<ES::Engine::Entity> entities = GenerateAndInstantiateTerrain(core);
+            _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
                 Game::PlayerJump
             );
@@ -37,13 +39,19 @@ namespace Game
                 Game::PointCameraToPlayer,
                 Game::PlayerMovement
             );
-            Game::SpawnPlayer(core);
+            _entitiesToKill.push_back(Game::SpawnPlayer(core));
         }
 
-        void _onDestroy(ES::Engine::Core &) final
+        void _onDestroy(ES::Engine::Core &core) final
         {
-            
+            for (auto entity : _entitiesToKill) {
+                if (entity.IsValid()) {
+                    entity.Destroy(core);
+                }
+            }
         }
+    private:
+        std::vector<ES::Engine::Entity> _entitiesToKill;
     };
 
     class SecondLevelScene : public ES::Plugin::Scene::Utils::AScene {

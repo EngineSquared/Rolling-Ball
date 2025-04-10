@@ -28,13 +28,15 @@ Game::TerrainType Game::GetRandomTerrainType(std::mt19937 &rng)
     return static_cast<Game::TerrainType>(dist(rng));
 }
 
-void Game::GenerateAndInstantiateTerrain(ES::Engine::Core &core) {
+std::vector<ES::Engine::Entity> Game::GenerateAndInstantiateTerrain(ES::Engine::Core &core) {
 	Game::Terrain terrain;
+    std::vector<ES::Engine::Entity> terrainEntities;
 
     GenerateTerrain(terrain);
     for (const auto &piece : terrain.pieces) {
-        ES::Engine::Entity entity = Game::CreateTerrainPiece(core, piece);
+        terrainEntities.push_back(Game::CreateTerrainPiece(core, piece));
     }
+    return terrainEntities;
 }
 
 void Game::GenerateTerrain(Game::Terrain &terrain)
