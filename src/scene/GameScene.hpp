@@ -39,6 +39,9 @@ namespace Game
                 Game::PointCameraToPlayer,
                 Game::PlayerMovement
             );
+            core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+                Game::RespawnPlayer
+            );
             _entitiesToKill.push_back(Game::SpawnPlayer(core));
         }
 

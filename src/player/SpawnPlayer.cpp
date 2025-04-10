@@ -110,3 +110,28 @@ ES::Engine::Entity Game::SpawnPlayer(ES::Engine::Core &core)
 
     return player;
 }
+
+void Game::RespawnPlayer(ES::Engine::Core &core)
+{
+    glm::vec3 initialPosition = glm::vec3(0.0f, 10.0f, 0.0f);
+    auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
+    auto &bodyInterface = physicsManager.GetPhysicsSystem().GetBodyInterface();
+
+    auto CancelMovementForce = [&](auto &body, Game::Player &player) {
+        if (body == nullptr) {
+            return;
+        }
+
+        bodyInterface.SetLinearVelocity(body->GetID(), JPH::Vec3::sZero());
+        bodyInterface.SetAngularVelocity(body->GetID(), JPH::Vec3::sZero());
+    };
+
+    core.GetRegistry()
+        .view<Game::Player, ES::Plugin::Object::Component::Transform, ES::Plugin::Physics::Component::RigidBody3D>()
+        .each([&](auto entity, auto &player, auto &transform, auto &rigidbody) {
+            if (transform.position.y < -20.0f) {
+                CancelMovementForce(rigidbody.body, player);
+                transform.position = initialPosition;
+            }
+    });
+}
