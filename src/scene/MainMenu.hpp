@@ -22,7 +22,7 @@ namespace Game
             playButton = PlayButton(core);
         }
     
-        void _onDestroy(ES::Engine::Core &core) final
+        void _onDestroy(ES::Engine::Core &) final
         {
             RemoveEntities();
         }
