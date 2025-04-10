@@ -18,12 +18,12 @@ using namespace ES::Plugin;
 
 namespace Game
 {
-    class GameScene : public ES::Plugin::Scene::Utils::AScene {
+    class FirstLevelScene : public ES::Plugin::Scene::Utils::AScene {
     
-      public:
-        GameScene() : ES::Plugin::Scene::Utils::AScene() {}
+    public:
+        FirstLevelScene() : ES::Plugin::Scene::Utils::AScene() {}
     
-      protected:
+    protected:
         void _onCreate(ES::Engine::Core &core) final
         {
 			GenerateAndInstantiateTerrain(core);
@@ -39,10 +39,28 @@ namespace Game
             );
             Game::SpawnPlayer(core);
         }
-    
+
         void _onDestroy(ES::Engine::Core &) final
         {
             
         }
     };
+
+    class SecondLevelScene : public ES::Plugin::Scene::Utils::AScene {
+    
+        public:
+            SecondLevelScene() : ES::Plugin::Scene::Utils::AScene() {}
+
+        protected:
+            void _onCreate(ES::Engine::Core &core) final
+            {
+                GenerateAndInstantiateTerrain(core);
+                Game::SpawnPlayer(core);
+            }
+
+            void _onDestroy(ES::Engine::Core &) final
+            {
+                
+            }
+        };
 }

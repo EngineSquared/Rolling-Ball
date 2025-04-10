@@ -4,6 +4,7 @@
 #include "RigidBody3D.hpp"
 #include "FinishSegment.hpp"
 #include "Player.hpp"
+#include "SceneManager.hpp"
 
 bool Game::EntityTouchesFinish(ES::Engine::Core &core, JPH::Body *player)
 {
@@ -36,7 +37,8 @@ void Game::PlayerEvents(ES::Engine::Core &core)
     core.GetRegistry()
         .view<Game::Player, ES::Plugin::Physics::Component::RigidBody3D>()
         .each([&](auto entity, auto &player, auto &rigidBody) {
-        if (EntityTouchesFinish(core, rigidBody.body))
-            std::cout << "Finished" << std::endl;  // Will be replaced by scene update
+        if (EntityTouchesFinish(core, rigidBody.body)) {
+            core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_second_level");
+        }
     });
 }
