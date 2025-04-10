@@ -94,7 +94,7 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
     return sphere;
 }
 
-void Game::SpawnPlayer(ES::Engine::Core &core)
+ES::Engine::Entity Game::SpawnPlayer(ES::Engine::Core &core)
 {
     auto initialPosition = glm::vec3(0.0f, 10.0f, 0.0f);
 
@@ -104,8 +104,9 @@ void Game::SpawnPlayer(ES::Engine::Core &core)
     player.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
     player.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "player");
     player.AddComponent<Game::Player>(core);
-
-    // Maybe this should be split in different systems
     auto &camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
-    camera.viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
+    camera.viewer.centerAt(initialPosition);
+    camera.viewer.lookFrom(glm::vec3(0.0f, 20.0f, -20.0f));
+
+    return player;
 }

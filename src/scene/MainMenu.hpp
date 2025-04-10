@@ -22,7 +22,7 @@ namespace Game
             playButton = PlayButton(core);
         }
     
-        void _onDestroy(ES::Engine::Core &core) final
+        void _onDestroy(ES::Engine::Core &) final
         {
             RemoveEntities();
         }
@@ -42,7 +42,7 @@ namespace Game
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
-                c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game");
+                c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_first_level");
             };
             buttonComp.displayType =
                 ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,

@@ -5,6 +5,7 @@
 #include "OBJLoader.hpp"
 
 #include "Generator.hpp"
+#include "FinishSegment.hpp"
 
 // Jolt includes
 #include <Jolt/RegisterTypes.h>
@@ -27,13 +28,15 @@ Game::TerrainType Game::GetRandomTerrainType(std::mt19937 &rng)
     return static_cast<Game::TerrainType>(dist(rng));
 }
 
-void Game::GenerateAndInstantiateTerrain(ES::Engine::Core &core) {
+std::vector<ES::Engine::Entity> Game::GenerateAndInstantiateTerrain(ES::Engine::Core &core) {
 	Game::Terrain terrain;
+    std::vector<ES::Engine::Entity> terrainEntities;
 
     GenerateTerrain(terrain);
     for (const auto &piece : terrain.pieces) {
-        ES::Engine::Entity entity = Game::CreateTerrainPiece(core, piece);
+        terrainEntities.push_back(Game::CreateTerrainPiece(core, piece));
     }
+    return terrainEntities;
 }
 
 void Game::GenerateTerrain(Game::Terrain &terrain)
@@ -58,9 +61,10 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
     ES::Engine::Entity terrainEntity = core.CreateEntity();
 
     terrainEntity.AddComponent<Object::Component::Transform>(core, piece.position, piece.scale, piece.rotationAngle);
-
     terrainEntity.AddComponent<OpenGL::Component::ShaderHandle>(core, "default");
     terrainEntity.AddComponent<OpenGL::Component::MaterialHandle>(core, "default");
+    if (piece.type == TerrainType::Finish)
+        terrainEntity.AddComponent<Game::Finish>(core);
 
     std::string modelName;
     switch (piece.type)
