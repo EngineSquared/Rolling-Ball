@@ -57,7 +57,7 @@ namespace Game
         {
             for (auto &entity : _entitiesToKill)
             {
-                _core->KillEntity(entity);
+                entity.Destroy(*_core);
             }
             _entitiesToKill.clear();
         }
