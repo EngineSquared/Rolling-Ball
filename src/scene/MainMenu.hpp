@@ -10,8 +10,6 @@ using namespace ES::Plugin;
 namespace Game
 {
     class MainMenu : public Scene::Utils::AScene {
-        private:
-            ES::Engine::Entity playButton;
       public:
       MainMenu() : Scene::Utils::AScene() {}
     
@@ -19,7 +17,8 @@ namespace Game
         void _onCreate(ES::Engine::Core &core) final
         {
             _core = &core;
-            playButton = PlayButton(core);
+            PlayButton(core);
+            QuitButton(core);
         }
     
         void _onDestroy(ES::Engine::Core &) final
@@ -27,7 +26,7 @@ namespace Game
             RemoveEntities();
         }
     private:
-        inline ES::Engine::Entity PlayButton(ES::Engine::Core &core)
+        inline void PlayButton(ES::Engine::Core &core)
         {
             auto buttonEntity = CreateEntity();
             buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
@@ -48,7 +47,29 @@ namespace Game
                 ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
                                                                 .hoverColor   = ES::Plugin::Colors::Utils::RED_COLOR,
                                                                 .pressedColor = ES::Plugin::Colors::Utils::GREEN_COLOR};
-            return buttonEntity;
+        }
+
+        inline void QuitButton(ES::Engine::Core &core)
+        {
+            auto buttonEntity = CreateEntity();
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "buttonQuit");
+            auto &sprite = buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core);
+            auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
+            auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
+            int width, height;
+            window.GetWindowSize(width, height);
+            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f + 32.f, 0.f);
+            buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
+            sprite.rect.size = glm::vec2(128.f, 32.f);
+            auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
+            buttonComp.onClick = [&](ES::Engine::Core &c) {
+                c.Stop();
+            };
+            buttonComp.displayType =
+                ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
+                                                                .hoverColor   = ES::Plugin::Colors::Utils::RED_COLOR,
+                                                                .pressedColor = ES::Plugin::Colors::Utils::GREEN_COLOR};
         }
 
         // TODO: those kind of entity management should be added into scene class to allow to easely create scene contextual entities
