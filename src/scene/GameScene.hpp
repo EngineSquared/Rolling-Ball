@@ -11,6 +11,9 @@
 #include "Player.hpp"
 #include "Generator.hpp"
 #include "DisplayTime.hpp"
+#include "FinishSegment.hpp"
+#include "Time.hpp"
+#include "UpdateTime.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -29,10 +32,14 @@ namespace Game
         void _onCreate(ES::Engine::Core &core) final
         {
 			std::vector<ES::Engine::Entity> entities = GenerateAndInstantiateTerrain(core);
+            entities.back().GetComponents<Game::Finish>(core).OnFinish = [&core](ES::Engine::Core &c) {
+                c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_second_level");
+            };
             AddTimeDisplay(core);
             _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
-                UpdateTextTime,
+                Game::UpdateTime,
+                Game::UpdateTextTime,
                 Game::PlayerJump,
                 Game::PlayerEvents
             );
@@ -43,6 +50,7 @@ namespace Game
             core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
                 Game::RespawnPlayer
             );
+            core.RegisterResource<Game::Time>(Game::Time{0.0f});
             _entitiesToKill.push_back(Game::SpawnPlayer(core));
         }
 
@@ -66,13 +74,23 @@ namespace Game
         protected:
             void _onCreate(ES::Engine::Core &core) final
             {
-                GenerateAndInstantiateTerrain(core);
-                Game::SpawnPlayer(core);
+                std::vector<ES::Engine::Entity> entities = GenerateAndInstantiateTerrain(core);
+                entities.back().GetComponents<Game::Finish>(core).OnFinish = [&core](ES::Engine::Core &c) {
+                    c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("end_scene");
+                };
+                _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
+                _entitiesToKill.push_back(Game::SpawnPlayer(core));
             }
 
-            void _onDestroy(ES::Engine::Core &) final
+        void _onDestroy(ES::Engine::Core &core) final
             {
-                
+                for (auto entity : _entitiesToKill) {
+                    if (entity.IsValid()) {
+                        entity.Destroy(core);
+                    }
+                }
             }
+        private:
+            std::vector<ES::Engine::Entity> _entitiesToKill;
         };
 }

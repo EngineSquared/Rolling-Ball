@@ -5,5 +5,7 @@
 
 namespace Game
 {
-    struct Finish {};
+    struct Finish {
+        std::function<void(ES::Engine::Core &)> OnFinish = nullptr;
+    };
 } // namespace Game

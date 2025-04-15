@@ -3,6 +3,7 @@
 #include "Core.hpp"
 #include "OpenGL.hpp"
 #include "UI.hpp"
+#include "Time.hpp"
 
 namespace Game
 {
@@ -23,16 +24,14 @@ namespace Game
 
     void UpdateTextTime(ES::Engine::Core &core)
     {
-        // Yes, this should be a resource and not a static variable
-        static float ts = 0.0f;
-        ts += core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
+        float ts = core.GetResource<Game::Time>().ts;
 
         core.GetRegistry()
             .view<ES::Plugin::OpenGL::Component::TextHandle, ES::Plugin::UI::Component::Text>()
-            .each([&core](auto entity, auto &textHandle, auto &text) {
+            .each([&ts](auto, auto &textHandle, auto &text) {
                 if (textHandle.name == "timeElapsedText")
                 {
-                    text.text = "Time elapsed: " + std::to_string(ts) + "s";
+                    text.text = fmt::format("Time elapsed: {:.2f}s", ts);
                 }
             });
     }
