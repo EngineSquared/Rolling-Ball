@@ -25,6 +25,7 @@
 #include "GameScene.hpp"
 #include "MainMenu.hpp"
 #include "Option.hpp"
+#include "EndScene.hpp"
 
 #include "LoadNormalShader.hpp"
 #include "LoadTextureShader.hpp"
@@ -65,6 +66,7 @@ int main(void)
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::SecondLevelScene>("game_second_level");
     core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("main_menu");
     core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::Option>("option");
+	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::EndScene>("end_scene");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
