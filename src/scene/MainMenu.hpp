@@ -18,6 +18,7 @@ namespace Game
         {
             _core = &core;
             PlayButton(core);
+            OptionButton(core);
             QuitButton(core);
         }
     
@@ -37,11 +38,34 @@ namespace Game
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
             int width, height;
             window.GetWindowSize(width, height);
-            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f - 16.f, 0.f);
+            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f + 32.f, 0.f);
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
                 c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_first_level");
+            };
+            buttonComp.displayType =
+                ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
+                                                                .hoverColor   = ES::Plugin::Colors::Utils::RED_COLOR,
+                                                                .pressedColor = ES::Plugin::Colors::Utils::GREEN_COLOR};
+        }
+
+        inline void OptionButton(ES::Engine::Core &core)
+        {
+            auto buttonEntity = CreateEntity();
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "buttonOption");
+            auto &sprite = buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core);
+            sprite.rect.size = glm::vec2(128.f, 32.f);
+            auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
+            auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
+            int width, height;
+            window.GetWindowSize(width, height);
+            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f - 16.f, 0.f);
+            buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
+            auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
+            buttonComp.onClick = [&](ES::Engine::Core &c) {
+                c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("option");
             };
             buttonComp.displayType =
                 ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
@@ -59,7 +83,7 @@ namespace Game
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
             int width, height;
             window.GetWindowSize(width, height);
-            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f + 32.f, 0.f);
+            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f - (16.f * 2.f + 32.f), 0.f);
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             sprite.rect.size = glm::vec2(128.f, 32.f);
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
