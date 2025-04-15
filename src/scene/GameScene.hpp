@@ -10,6 +10,7 @@
 #include "HasChanged.hpp"
 #include "Player.hpp"
 #include "Generator.hpp"
+#include "DisplayTime.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -28,11 +29,11 @@ namespace Game
         void _onCreate(ES::Engine::Core &core) final
         {
 			std::vector<ES::Engine::Entity> entities = GenerateAndInstantiateTerrain(core);
+            AddTimeDisplay(core);
             _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
-                Game::PlayerJump
-            );
-            core.RegisterSystem<ES::Engine::Scheduler::Update>(
+                UpdateTextTime,
+                Game::PlayerJump,
                 Game::PlayerEvents
             );
             core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
