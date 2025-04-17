@@ -20,6 +20,7 @@ namespace Game
         {
             _core = &core;
             MainMenuButton(core);
+            FullScreenButton(core);
         }
     
         void _onDestroy(ES::Engine::Core &) final
@@ -44,6 +45,29 @@ namespace Game
             buttonComp.onClick = [&](ES::Engine::Core &c) {
                 c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
                 std::cout << "Main Menu" << std::endl;
+            };
+            buttonComp.displayType =
+                ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
+                                                                .hoverColor   = ES::Plugin::Colors::Utils::RED_COLOR,
+                                                                .pressedColor = ES::Plugin::Colors::Utils::GREEN_COLOR};
+        }
+
+        void FullScreenButton(ES::Engine::Core &core)
+        {
+            auto buttonEntity = CreateEntity();
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "buttonFullScreen");
+            auto &sprite = buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core);
+            sprite.rect.size = glm::vec2(32.f, 32.f);
+            auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
+            auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
+            int width, height;
+            window.GetWindowSize(width, height);
+            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 16.f, static_cast<float>(height) / 2.f - 64.f, 0.f);
+            buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(32.f, 32.f));
+            auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
+            buttonComp.onClick = [&](ES::Engine::Core &c) {
+                c.GetResource<Window::Resource::Window>().ToggleFullscreen();
             };
             buttonComp.displayType =
                 ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
