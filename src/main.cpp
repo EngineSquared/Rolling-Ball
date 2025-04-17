@@ -1,3 +1,6 @@
+#ifndef VULKAN
+#    include <GL/glew.h>
+#endif
 #include "Core.hpp"
 #include "Engine.hpp"
 #include "Entity.hpp"
@@ -55,7 +58,7 @@ int main(void)
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
 
 	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(ES::Plugin::Input::Resource::InputManager());
-	
+
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::FirstLevelScene>("game_first_level");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::SecondLevelScene>("game_second_level");
     core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("main_menu");

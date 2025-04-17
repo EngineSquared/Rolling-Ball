@@ -79,6 +79,18 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
         mesh.indices.push_back(tri.v2);
     }
 
+    auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
+    auto &texture = textureManager.Add(entt::hashed_string{"default"}, "asset/textures/default.png");
+
+    mesh.texCoords.resize(mesh.vertices.size());
+    for (size_t i = 0; i < mesh.vertices.size(); ++i) {
+        const auto& vertex = mesh.vertices[i];
+        float u = 0.5f + atan2(vertex.z, vertex.x) / (2.0f * M_PI);
+        float v = 0.5f - asin(vertex.y / radius) / M_PI;
+        mesh.texCoords[i] = glm::vec2(u, v);
+        std::cout << "TexCoord: " << mesh.texCoords[i].x << ", " << mesh.texCoords[i].y << std::endl;
+    }
+
     ES::Engine::Entity sphere = core.CreateEntity();
 
     sphere.AddComponent<ES::Plugin::Object::Component::Transform>(core, initialPosition, glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));

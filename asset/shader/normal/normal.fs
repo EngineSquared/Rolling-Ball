@@ -2,6 +2,9 @@
 
 in vec3 Position;
 in vec3 Normal;
+in vec2 TexCoord;
+
+uniform sampler2D texture0;
 
 uniform vec3 CamPos;
 
@@ -40,6 +43,11 @@ void main() {
     finalColor = finalColor + diffuse + specular;
     finalColor = ambient + finalColor;
 
-    // multiplying finalColor with 0.001 to avoir error in logger
+    // Apply texture
+    vec4 texColor = texture(texture0, TexCoord);
+    if (texColor.a >= 0.1)
+        finalColor *= texColor.rgb;
+
+    // multiplying finalColor with 0.001 to avoid error in logger
     FragColor = vec4(finalColor * 0.001 + Normal, 1.0);
 }
