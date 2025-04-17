@@ -67,6 +67,9 @@ int main(void)
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
 		[](ES::Engine::Core &c) {
+			c.GetResource<Window::Resource::Window>().SetTitle("ES Rolling-Ball");
+		},
+		[](ES::Engine::Core &c) {
 			c.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
 		},
 		[](ES::Engine::Core &c) {
