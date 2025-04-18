@@ -25,6 +25,7 @@ uniform MaterialInfo Material;
 out vec4 FragColor;
 
 void main() {
+    vec3 base_color = texture(texture0, TexCoord).rgb;
     vec3 finalColor = vec3(0,0,0);
     vec3 ambient = Material.Ka * Light[0].Intensity;
     for (int i = 0; i < 4; i++) {
@@ -43,11 +44,5 @@ void main() {
     finalColor = finalColor + diffuse + specular;
     finalColor = ambient + finalColor;
 
-    // Apply texture
-    vec4 texColor = texture(texture0, TexCoord);
-    if (texColor.a >= 0.1)
-        finalColor *= texColor.rgb;
-
-    // multiplying finalColor with 0.001 to avoid error in logger
-    FragColor = vec4(finalColor * 0.001 + Normal, 1.0);
+    FragColor = vec4(finalColor * base_color, 1.0);
 }

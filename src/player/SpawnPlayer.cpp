@@ -88,7 +88,6 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
         float u = 0.5f + atan2(vertex.z, vertex.x) / (2.0f * M_PI);
         float v = 0.5f - asin(vertex.y / radius) / M_PI;
         mesh.texCoords[i] = glm::vec2(u, v);
-        std::cout << "TexCoord: " << mesh.texCoords[i].x << ", " << mesh.texCoords[i].y << std::endl;
     }
 
     ES::Engine::Entity sphere = core.CreateEntity();
@@ -115,6 +114,7 @@ ES::Engine::Entity Game::SpawnPlayer(ES::Engine::Core &core)
     player.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "normal");
     player.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
     player.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "player");
+    player.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "default");
     player.AddComponent<Game::Player>(core);
     auto &camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
     camera.viewer.centerAt(initialPosition);
