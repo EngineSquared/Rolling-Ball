@@ -10,6 +10,7 @@
 #include "HasChanged.hpp"
 #include "Player.hpp"
 #include "Generator.hpp"
+#include "Save.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -27,7 +28,13 @@ namespace Game
     protected:
         void _onCreate(ES::Engine::Core &core) final
         {
-			std::vector<ES::Engine::Entity> entities = GenerateAndInstantiateTerrain(core);
+			std::vector<ES::Engine::Entity> entities;
+            if (Game::loadedTerrain.has_value()) {
+                entities = Game::InstantiateLoadedTerrain(core, Game::loadedTerrain.value());
+            } else {
+                entities = Game::GenerateAndInstantiateTerrain(core);
+            }
+
             _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
                 Game::PlayerJump

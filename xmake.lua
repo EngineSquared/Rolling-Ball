@@ -24,6 +24,7 @@ target("RollingBall")
     add_includedirs("$(projectdir)/src/terrain")
     add_includedirs("$(projectdir)/src/scene")
     add_includedirs("$(projectdir)/src/shader")
+    add_includedirs("$(projectdir)/src/utils")
 
     add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics")
 
