@@ -44,5 +44,5 @@ void main() {
     finalColor = finalColor + diffuse + specular;
     finalColor = ambient + finalColor;
 
-    FragColor = vec4(finalColor * base_color, 1.0);
+    FragColor = vec4(finalColor* 0.001 + Normal * base_color, 1.0);
 }
