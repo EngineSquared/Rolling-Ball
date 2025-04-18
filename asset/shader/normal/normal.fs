@@ -2,6 +2,9 @@
 
 in vec3 Position;
 in vec3 Normal;
+in vec2 TexCoord;
+
+uniform sampler2D texture0;
 
 uniform vec3 CamPos;
 
@@ -22,6 +25,7 @@ uniform MaterialInfo Material;
 out vec4 FragColor;
 
 void main() {
+    vec3 base_color = texture(texture0, TexCoord).rgb;
     vec3 finalColor = vec3(0,0,0);
     vec3 ambient = Material.Ka * Light[0].Intensity;
     for (int i = 0; i < 4; i++) {
@@ -40,6 +44,5 @@ void main() {
     finalColor = finalColor + diffuse + specular;
     finalColor = ambient + finalColor;
 
-    // multiplying finalColor with 0.001 to avoir error in logger
-    FragColor = vec4(finalColor * 0.001 + Normal, 1.0);
+    FragColor = vec4(finalColor* 0.001 + Normal * base_color, 1.0);
 }

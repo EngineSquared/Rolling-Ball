@@ -27,7 +27,6 @@ static bool PlayerTouchesTerrain(ES::Engine::Core &core, const JPH::BodyID &play
         if (physicsSystem.WereBodiesInContact(player, rigidBody.body->GetID())) {
             touchesTerrain = true;
         }
-        
     });
 
     return touchesTerrain;
