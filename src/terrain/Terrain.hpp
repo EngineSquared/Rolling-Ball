@@ -11,6 +11,11 @@ namespace Game {
         CurveLeft,
         CurveRight,
         Wave,
+        Jump,
+        JumpSingle,
+        ObstacleA,
+        ObstacleB,
+        ObstacleC,
         Finish
     };
 
@@ -38,4 +43,31 @@ namespace Game {
             rng.seed(rd());
         }
     };
+
+    struct SegmentMetrics {
+        float lengthZ;
+        float heightDeltaY;
+    };
+
+    static const std::string GetModelPathFromTerrainType(const TerrainType type) {
+        static const std::unordered_map<TerrainType, std::string> modelPaths = {
+            {TerrainType::Flat, "asset/models/straight.obj"},
+            {TerrainType::Ramp, "asset/models/ramp.obj"},
+            {TerrainType::CurveLeft, "asset/models/curve_left.obj"},
+            {TerrainType::CurveRight, "asset/models/curve_right.obj"},
+            {TerrainType::Wave, "asset/models/wave.obj"},
+            {TerrainType::Jump, "asset/models/jump.obj"},
+            {TerrainType::JumpSingle, "asset/models/jump_single.obj"},
+            {TerrainType::ObstacleA, "asset/models/obstacle1.obj"},
+            {TerrainType::ObstacleB, "asset/models/obstacle2.obj"},
+            {TerrainType::ObstacleC, "asset/models/obstacle3.obj"},
+            {TerrainType::Finish, "asset/models/finish.obj"},
+        };
+    
+        auto it = modelPaths.find(type);
+        if (it != modelPaths.end()) {
+            return it->second;
+        }
+        return "asset/models/straight.obj"; // Default fallback
+    }
 }

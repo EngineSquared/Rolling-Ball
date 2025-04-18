@@ -22,9 +22,47 @@
 
 using namespace ES::Plugin;
 
+Game::SegmentMetrics Game::GetSegmentMetrics(Game::TerrainType type, const glm::vec3 &scale, const glm::quat &rotation)
+{
+    if (cachedMetrics.contains(type))
+        return cachedMetrics[type];
+
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> texCoords;
+    std::vector<std::seed_seq::result_type> indices;
+    std::string modelPath = GetModelPathFromTerrainType(type);
+
+    if (!ES::Plugin::Object::Resource::OBJLoader::loadModel(modelPath, vertices, normals, texCoords, indices)) {
+        ES::Utils::Log::Error(fmt::format("Failed to load model for metrics: {}", modelPath));
+        return {20.0f, 0.0f}; // fallback
+    }
+
+    glm::mat4 transform = glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.0f), scale);
+    glm::vec3 minPos(FLT_MAX);
+    glm::vec3 maxPos(-FLT_MAX);
+
+    for (const auto &v : vertices) {
+        glm::vec3 transformed = glm::vec3(transform * glm::vec4(v, 1.0f));
+        minPos = glm::min(minPos, transformed);
+        maxPos = glm::max(maxPos, transformed);
+    }
+    glm::vec3 delta = maxPos - minPos;
+
+    float length = std::floor(std::max({delta.x, delta.y, delta.z}));
+    if (type == Game::TerrainType::JumpSingle)
+        length = 40.0f; // Hardcoding the length for this segment because to needs a gap 
+
+    SegmentMetrics metrics;
+    metrics.lengthZ = length;
+    metrics.heightDeltaY = 0.0f;
+    cachedMetrics[type] = metrics;
+    return metrics;
+}
+
 Game::TerrainType Game::GetRandomTerrainType(std::mt19937 &rng)
 {
-    std::uniform_int_distribution<int> dist(0, 4);
+    std::uniform_int_distribution<int> dist(0, static_cast<int>(Game::TerrainType::Finish) - 1);
     return static_cast<Game::TerrainType>(dist(rng));
 }
 
@@ -41,17 +79,26 @@ std::vector<ES::Engine::Entity> Game::GenerateAndInstantiateTerrain(ES::Engine::
 
 void Game::GenerateTerrain(Game::Terrain &terrain)
 {
-    for (int i = 0; i < terrain.segmentCount + 1; ++i)
+    glm::vec3 currentPosition = terrain.segmentsPositionOffset;
+
+    for (int i = 0; i <= terrain.segmentCount; ++i)
     {
         auto type = GetRandomTerrainType(terrain.rng);
+        if (i == 0)
+            type = Game::TerrainType::Flat;
         if (i == terrain.segmentCount)
             type = Game::TerrainType::Finish;
 
-        Game::TerrainPiece piece;
+        SegmentMetrics metrics = GetSegmentMetrics(type, terrain.segmentsScale, terrain.segmentsRotation);
+        TerrainPiece piece;
         piece.type = type;
-        piece.position = terrain.segmentsPositionOffset + terrain.segmentsGapPositionOffset * glm::vec3(static_cast<float>(i));
         piece.scale = terrain.segmentsScale;
         piece.rotationAngle = terrain.segmentsRotation;
+        piece.position = currentPosition;
+        glm::vec3 forward = glm::rotate(terrain.segmentsRotation, glm::vec3(-1, 0, 0));
+        glm::vec3 up = glm::rotate(terrain.segmentsRotation, glm::vec3(0, -1, 0));
+        currentPosition += forward * metrics.lengthZ;
+        currentPosition += up * metrics.heightDeltaY;
         terrain.pieces.push_back(piece);
     }
 }
@@ -66,46 +113,14 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
     if (piece.type == TerrainType::Finish)
         terrainEntity.AddComponent<Game::Finish>(core);
 
-    std::string modelName;
-    switch (piece.type)
-    {
-    case TerrainType::Flat:
-        modelName = "floor";
-        break;
-    case TerrainType::Ramp:
-        modelName = "ramp";
-        break;
-    case TerrainType::CurveLeft:
-        modelName = "curve_left";
-        break;
-    case TerrainType::CurveRight:
-        modelName = "curve_right";
-        break;
-    case TerrainType::Wave:
-        modelName = "wave";
-        break;
-    case TerrainType::Finish:
-        modelName= "Finish";
-        break;
-    default:
-        modelName = "default";
-        break;
-    }
+    std::string modelName = GetModelPathFromTerrainType(piece.type);
     terrainEntity.AddComponent<OpenGL::Component::ModelHandle>(core, modelName);
 
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> texCoords;
     std::vector<std::seed_seq::result_type> indices;
-
-    std::string modelPath;
-    if (piece.type == TerrainType::Flat) modelPath = "asset/models/straight.obj";
-    else if (piece.type == TerrainType::Ramp) modelPath = "asset/models/ramp.obj";
-    else if (piece.type == TerrainType::CurveLeft) modelPath = "asset/models/curve_left.obj";
-    else if (piece.type == TerrainType::CurveRight) modelPath = "asset/models/curve_right.obj";
-    else if (piece.type == TerrainType::Wave) modelPath = "asset/models/wave.obj";
-    else if (piece.type == TerrainType::Finish) modelPath = "asset/models/finish.obj";
-    else modelPath = "asset/models/straight.obj";
+    std::string modelPath = GetModelPathFromTerrainType(piece.type);
 
     if (ES::Plugin::Object::Resource::OBJLoader::loadModel(modelPath, vertices, normals, texCoords, indices)) {
         Object::Component::Mesh mesh;
