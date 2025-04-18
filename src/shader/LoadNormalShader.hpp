@@ -14,7 +14,6 @@ void LoadNormalShader(ES::Engine::Core &core)
     OpenGL::Utils::ShaderProgram &sp = shaderManager.Add("normal"_hs);
     sp.Create();
     sp.initFromFiles(vertexShader, fragmentShader);
-    sp.addUniform("texture0");
 	sp.addUniform("MVP");
     sp.addUniform("ModelMatrix");
     sp.addUniform("NormalMatrix");
