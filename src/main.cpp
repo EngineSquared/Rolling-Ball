@@ -1,3 +1,6 @@
+#ifndef VULKAN
+#    include <GL/glew.h>
+#endif
 #include "Core.hpp"
 #include "Engine.hpp"
 #include "Entity.hpp"
@@ -21,8 +24,11 @@
 
 #include "GameScene.hpp"
 #include "MainMenu.hpp"
+#include "Option.hpp"
+#include "EndScene.hpp"
 
 #include "LoadNormalShader.hpp"
+#include "LoadTextureShader.hpp"
 
 #include <iostream>
 
@@ -46,54 +52,6 @@ using namespace JPH; // NOT RECOMMENDED
 using namespace JPH::literals;
 using namespace ES::Plugin;
 
-static void UpdateButtonTextureColor(ES::Plugin::UI::Component::Button &button,
-	ES::Plugin::OpenGL::Component::Sprite &sprite)
-{
-	auto const &displayType = std::get<ES::Plugin::UI::Component::DisplayType::TintColor>(button.displayType);
-	switch (button.state)
-	{
-		using enum ES::Plugin::UI::Component::Button::State;
-		case Normal: sprite.color = displayType.normalColor; break;
-		case Hover: sprite.color = displayType.hoverColor; break;
-		case Pressed: sprite.color = displayType.pressedColor; break;
-	}
-}
-
-static void UpdateButtonTextureImage(
-    [[maybe_unused]] ES::Plugin::UI::Component::Button &button,
-	[[maybe_unused]] ES::Plugin::OpenGL::Component::Sprite &sprite)
-{
-	// TODO: Implement texture usage for image button
-	// auto const &displayType = std::get<ES::Plugin::UI::Component::DisplayType::Image>(button.displayType);
-	// switch (button.state)
-	// {
-	// 	using enum ES::Plugin::UI::Component::Button::State;
-	// 	// case Normal: sprite.textureID = displayType.normalImageID; break;
-	// 	// case Hover: sprite.textureID = displayType.hoverImageID; break;
-	// 	// case Pressed: sprite.textureID = displayType.pressedImageID; break;
-	// }
-}
-
-static void UpdateButtonTexture(ES::Engine::Core &core)
-{
-	auto view = core.GetRegistry()
-		.view<ES::Plugin::UI::Component::Button, ES::Plugin::OpenGL::Component::Sprite,
-	ES::Plugin::Tools::HasChanged<ES::Plugin::UI::Component::Button>>();
-	for (auto entity : view)
-	{
-		auto &button = view.get<ES::Plugin::UI::Component::Button>(entity);
-		auto &sprite = view.get<ES::Plugin::OpenGL::Component::Sprite>(entity);
-		if (std::holds_alternative<ES::Plugin::UI::Component::DisplayType::TintColor>(button.displayType))
-		{
-			UpdateButtonTextureColor(button, sprite);
-		}
-		else if (std::holds_alternative<ES::Plugin::UI::Component::DisplayType::Image>(button.displayType))
-		{
-			UpdateButtonTextureImage(button, sprite);
-		}
-	}
-}
-
 int main(void)
 {
     ES::Engine::Core core;
@@ -103,13 +61,19 @@ int main(void)
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
 
 	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(ES::Plugin::Input::Resource::InputManager());
-	
+
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::FirstLevelScene>("game_first_level");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::SecondLevelScene>("game_second_level");
     core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("main_menu");
+    core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::Option>("option");
+	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::EndScene>("end_scene");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+		[](ES::Engine::Core &c) {
+			c.GetResource<Window::Resource::Window>().SetTitle("ES Rolling-Ball");
+			c.GetResource<Window::Resource::Window>().SetSize(1280, 720);
+		},
 		[](ES::Engine::Core &c) {
 			c.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 10.0f, -20.0f));
 		},
@@ -118,7 +82,8 @@ int main(void)
 			c.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(2);
 			c.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
 		},
-		Game::LoadNormalShader
+		Game::LoadNormalShader,
+		Game::LoadTextureShader
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
@@ -129,7 +94,7 @@ int main(void)
         ES::Plugin::UI::System::ButtonClick,
         ES::Engine::Entity::RemoveTemporaryComponents,
         ES::Plugin::UI::System::UpdateButtonState,
-        UpdateButtonTexture
+        ES::Plugin::UI::System::UpdateButtonTexture
 	);
 
 	core.RunCore();

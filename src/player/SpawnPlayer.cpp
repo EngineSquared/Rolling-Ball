@@ -79,6 +79,17 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
         mesh.indices.push_back(tri.v2);
     }
 
+    auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
+    auto &texture = textureManager.Add(entt::hashed_string{"default"}, "asset/textures/default.png");
+
+    mesh.texCoords.resize(mesh.vertices.size());
+    for (size_t i = 0; i < mesh.vertices.size(); ++i) {
+        const auto& vertex = mesh.vertices[i];
+        float u = 0.5f + atan2(vertex.z, vertex.x) / (2.0f * M_PI);
+        float v = 0.5f - asin(vertex.y / radius) / M_PI;
+        mesh.texCoords[i] = glm::vec2(u, v);
+    }
+
     ES::Engine::Entity sphere = core.CreateEntity();
 
     sphere.AddComponent<ES::Plugin::Object::Component::Transform>(core, initialPosition, glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
@@ -100,9 +111,10 @@ ES::Engine::Entity Game::SpawnPlayer(ES::Engine::Core &core)
 
     auto player = CreateSphere(core, false, 2, initialPosition);
 
-    player.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "normal");
+    player.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "texture");
     player.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
     player.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "player");
+    player.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "default");
     player.AddComponent<Game::Player>(core);
     auto &camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
     camera.viewer.centerAt(initialPosition);

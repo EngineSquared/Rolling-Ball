@@ -4,14 +4,14 @@
 
 namespace Game
 {
-void LoadNormalShader(ES::Engine::Core &core)
+void LoadTextureShader(ES::Engine::Core &core)
 {
 	// This "using" allow to use "_hs" compile time hashing for strings
 	using namespace entt;
-	const std::string vertexShader = "asset/shader/normal/normal.vs";
-	const std::string fragmentShader = "asset/shader/normal/normal.fs";
+	const std::string vertexShader = "asset/shader/texture/texture.vs";
+	const std::string fragmentShader = "asset/shader/texture/texture.fs";
 	auto &shaderManager = core.GetResource<OpenGL::Resource::ShaderManager>();
-    OpenGL::Utils::ShaderProgram &sp = shaderManager.Add("normal"_hs);
+    OpenGL::Utils::ShaderProgram &sp = shaderManager.Add("texture"_hs);
     sp.Create();
     sp.initFromFiles(vertexShader, fragmentShader);
     sp.addUniform("texture0");

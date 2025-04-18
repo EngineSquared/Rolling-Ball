@@ -16,7 +16,13 @@ static bool CreateSaveFile(const std::string &filename)
 
 void Game::RetrieveSaveGameState(ES::Engine::Core &core)
 {
+    if (!std::filesystem::exists(SAVE_FILENAME))
+        return;
     std::fstream saveFile(SAVE_FILENAME, std::ios::binary | std::ios::in);
+    if (!saveFile.is_open()) {
+        ES::Utils::Log::Error("Could not open save file");
+        return;
+    }
     std::array<std::byte, 5> fileHeader;
     saveFile.read(reinterpret_cast<char*>(fileHeader.data()), fileHeader.size());
     if (fileHeader != SAVEFILE_MAGIC_HEADER) {
@@ -53,7 +59,7 @@ void Game::SaveGameState(ES::Engine::Core &core)
             ES::Utils::Log::Error("Could not save the game, failed to create save file");
             return;
         }
-        ES::Utils::Log::Error("Save file created successfully");
+        ES::Utils::Log::Info("Save file created successfully");
     }
     std::fstream saveFile(SAVE_FILENAME, std::ios::binary | std::ios::out | std::ios::trunc);
 
