@@ -19,8 +19,8 @@
 #include "PlayerMovement.hpp"
 #include "PlayerJump.hpp"
 
-// #include "Terrain.hpp"
 #include "Generator.hpp"
+#include "Save.hpp"
 
 #include "GameScene.hpp"
 #include "MainMenu.hpp"
@@ -85,6 +85,9 @@ int main(void)
 		Game::LoadNormalShader,
 		Game::LoadTextureShader
 	);
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
+	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(Game::SaveGameState);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Update>(
 		ES::Plugin::Scene::System::UpdateScene,
