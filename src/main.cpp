@@ -26,6 +26,7 @@
 #include "MainMenu.hpp"
 
 #include "LoadNormalShader.hpp"
+#include "LoadTextureShader.hpp"
 
 #include <iostream>
 
@@ -73,7 +74,8 @@ int main(void)
 			c.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(2);
 			c.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
 		},
-		Game::LoadNormalShader
+		Game::LoadNormalShader,
+		Game::LoadTextureShader
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Update>(
