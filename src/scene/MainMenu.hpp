@@ -29,25 +29,29 @@ namespace Game
     private:
         inline void PlayButton(ES::Engine::Core &core)
         {
+            auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
+    		textureManager.Add(entt::hashed_string{"startButton"}, "asset/textures/StartButton.png");
             auto buttonEntity = CreateEntity();
-            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "sprite");
             buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "buttonPlay");
-            auto &sprite = buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core);
+            auto &sprite = buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core, ES::Plugin::Colors::Utils::WHITE_COLOR);
             sprite.rect.size = glm::vec2(128.f, 32.f);
             auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
             int width, height;
             window.GetWindowSize(width, height);
             tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f + 32.f, 0.f);
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "startButton");
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
                 c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_first_level");
             };
+            
             buttonComp.displayType =
-                ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
-                                                                .hoverColor   = ES::Plugin::Colors::Utils::RED_COLOR,
-                                                                .pressedColor = ES::Plugin::Colors::Utils::GREEN_COLOR};
+                ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::WHITE_COLOR,
+                                                                .hoverColor   = ES::Plugin::Colors::Utils::LIGHTGRAY_COLOR,
+                                                                .pressedColor = ES::Plugin::Colors::Utils::GRAY_COLOR};
         }
 
         inline void OptionButton(ES::Engine::Core &core)

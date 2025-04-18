@@ -29,6 +29,7 @@
 
 #include "LoadNormalShader.hpp"
 #include "LoadTextureShader.hpp"
+#include "LoadTextureSpriteShader.hpp"
 
 #include <iostream>
 
@@ -83,7 +84,8 @@ int main(void)
 			c.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
 		},
 		Game::LoadNormalShader,
-		Game::LoadTextureShader
+		Game::LoadTextureShader,
+		Game::LoadTextureSpriteShader
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);

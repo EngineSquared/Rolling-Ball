@@ -15,6 +15,7 @@
 #include "FinishSegment.hpp"
 #include "Time.hpp"
 #include "UpdateTime.hpp"
+#include "OpenGL.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -58,6 +59,8 @@ namespace Game
                 Game::RespawnPlayer
             );
             core.RegisterResource<Game::Time>(Game::Time{0.0f});
+            auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
+            textureManager.Add(entt::hashed_string{"default"}, "asset/textures/default.png");
             _entitiesToKill.push_back(Game::SpawnPlayer(core));
         }
 
