@@ -162,6 +162,7 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
         terrainEntity.AddComponent<Physics::Component::RigidBody3D>(
             core, shapeSettings, JPH::EMotionType::Static, Physics::Utils::Layers::NON_MOVING
         );
+        terrainEntity.AddComponent<Game::TerrainPiece>(core);
         ES::Utils::Log::Info(fmt::format("Loaded terrain 3D model for {} successfully", modelPath));
     } else {
         ES::Utils::Log::Error(fmt::format("Failed to load terrain 3D model for {}", modelPath));
