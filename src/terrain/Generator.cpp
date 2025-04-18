@@ -66,14 +66,28 @@ Game::TerrainType Game::GetRandomTerrainType(std::mt19937 &rng)
     return static_cast<Game::TerrainType>(dist(rng));
 }
 
+std::vector<ES::Engine::Entity> Game::InstantiateLoadedTerrain(ES::Engine::Core &core, const Game::Terrain &terrain)
+{
+    std::vector<ES::Engine::Entity> terrainEntities;
+
+    ES::Engine::Entity terrainRootEntity = core.CreateEntity();
+    for (const auto &piece : terrain.pieces) {
+        terrainEntities.push_back(Game::CreateTerrainPiece(core, piece));
+    }
+    terrainRootEntity.AddComponent<Game::Terrain>(core, terrain);
+    return terrainEntities;
+}
+
 std::vector<ES::Engine::Entity> Game::GenerateAndInstantiateTerrain(ES::Engine::Core &core) {
 	Game::Terrain terrain;
     std::vector<ES::Engine::Entity> terrainEntities;
 
     GenerateTerrain(terrain);
+    ES::Engine::Entity terrainRootEntity = core.CreateEntity();
     for (const auto &piece : terrain.pieces) {
         terrainEntities.push_back(Game::CreateTerrainPiece(core, piece));
     }
+    terrainRootEntity.AddComponent<Game::Terrain>(core, terrain);
     return terrainEntities;
 }
 
@@ -152,8 +166,5 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
     } else {
         ES::Utils::Log::Error(fmt::format("Failed to load terrain 3D model for {}", modelPath));
     }
-
-    terrainEntity.AddComponent<Game::Terrain>(core);
-
     return terrainEntity;
 }

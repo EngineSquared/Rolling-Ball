@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Game {
-    enum class TerrainType {
+    enum class TerrainType : int {
         Flat,
         Ramp,
         CurveLeft,
