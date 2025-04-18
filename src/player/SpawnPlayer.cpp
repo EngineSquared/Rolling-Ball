@@ -10,6 +10,7 @@
 #include "OpenGL.hpp"
 
 #include <iostream>
+#include <numbers>
 
 // Jolt includes
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
@@ -85,8 +86,8 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
     mesh.texCoords.resize(mesh.vertices.size());
     for (size_t i = 0; i < mesh.vertices.size(); ++i) {
         const auto& vertex = mesh.vertices[i];
-        float u = 0.5f + atan2(vertex.z, vertex.x) / (2.0f * M_PI);
-        float v = 0.5f - asin(vertex.y / radius) / M_PI;
+        float u = 0.5f + atan2(vertex.z, vertex.x) / (2.0f * std::numbers::pi);
+        float v = 0.5f - asin(vertex.y / radius) / std::numbers::pi;
         mesh.texCoords[i] = glm::vec2(u, v);
     }
 
