@@ -15,6 +15,7 @@
 #include "FinishSegment.hpp"
 #include "Time.hpp"
 #include "UpdateTime.hpp"
+#include "Events.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -39,16 +40,31 @@ namespace Game
                 entities = Game::GenerateAndInstantiateTerrain(core);
             }
 
-            entities.back().GetComponents<Game::Finish>(core).OnFinish = [&core](ES::Engine::Core &c) {
-                c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_second_level");
-            };
+            // Avoid trying to access the Finish segment on the last entity if a new segment has been added
+            // This condition only applies when segments are added or removed from the code
+            if (!entities.back().HasComponents<Game::Finish>(core)) {
+                ES::Utils::Log::Warn("Last entity between save file and registry is not a Finish Segment");
+                for (auto &entity : entities) {
+                    if (entity.HasComponents<Game::Finish>(core)) {
+                        entity.GetComponents<Game::Finish>(core).OnFinish = [&core](ES::Engine::Core &c) {
+                            c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_second_level");
+                        };
+                    }
+                }
+            } else {
+                entities.back().GetComponents<Game::Finish>(core).OnFinish = [&core](ES::Engine::Core &c) {
+                    c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_second_level");
+                };
+            }
             AddTimeDisplay(core);
             _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
                 Game::UpdateTime,
                 Game::UpdateTextTime,
                 Game::PlayerJump,
-                Game::PlayerEvents
+                Game::PlayerEvents,
+                Game::MoveSegmentsSideway,
+                Game::MoveSegmentsSquish
             );
             core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
                 Game::PointCameraToPlayer,

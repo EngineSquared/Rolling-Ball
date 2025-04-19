@@ -16,6 +16,8 @@ namespace Game {
         ObstacleA,
         ObstacleB,
         ObstacleC,
+        MovingObstacleA,
+        MovingObstacleB,
         Finish
     };
 
@@ -61,6 +63,8 @@ namespace Game {
             {TerrainType::ObstacleA, "asset/models/obstacle1.obj"},
             {TerrainType::ObstacleB, "asset/models/obstacle2.obj"},
             {TerrainType::ObstacleC, "asset/models/obstacle3.obj"},
+            {TerrainType::MovingObstacleA, "asset/models/moving_obstacle1.obj"},
+            {TerrainType::MovingObstacleB, "asset/models/moving_obstacle2.obj"},
             {TerrainType::Finish, "asset/models/finish.obj"},
         };
     
