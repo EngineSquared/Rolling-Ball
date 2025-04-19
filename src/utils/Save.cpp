@@ -14,6 +14,13 @@ static bool CreateSaveFile(const std::string &filename)
     return true;
 }
 
+bool Game::TerrainExists(ES::Engine::Core &core)
+{
+    if (!core.GetRegistry().view<Game::Terrain>().empty())
+        return true;
+    return false;
+}
+
 void Game::RetrieveSaveGameState(ES::Engine::Core &core)
 {
     if (!std::filesystem::exists(SAVE_FILENAME))
@@ -54,6 +61,8 @@ void Game::RetrieveSaveGameState(ES::Engine::Core &core)
 
 void Game::SaveGameState(ES::Engine::Core &core)
 {
+    if (!TerrainExists(core))
+        return; // Do not save on the main menu
     if (!std::filesystem::exists(SAVE_FILENAME)) {
         if (!CreateSaveFile(SAVE_FILENAME)) {
             ES::Utils::Log::Error("Could not save the game, failed to create save file");
