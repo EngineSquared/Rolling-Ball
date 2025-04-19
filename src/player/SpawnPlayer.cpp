@@ -81,9 +81,6 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
         mesh.indices.push_back(tri.v2);
     }
 
-    auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
-    auto &texture = textureManager.Add(entt::hashed_string{"default"}, "asset/textures/default.png");
-
     mesh.texCoords.resize(mesh.vertices.size());
     for (size_t i = 0; i < mesh.vertices.size(); ++i) {
         const auto& vertex = mesh.vertices[i];

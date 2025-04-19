@@ -18,6 +18,7 @@
 #include "PointCameraToPlayer.hpp"
 #include "PlayerMovement.hpp"
 #include "PlayerJump.hpp"
+#include "InitPlayerContactCallback.hpp"
 
 #include "Generator.hpp"
 #include "Save.hpp"
@@ -29,6 +30,7 @@
 
 #include "LoadNormalShader.hpp"
 #include "LoadTextureShader.hpp"
+#include "LoadTextureSpriteShader.hpp"
 
 #include <iostream>
 
@@ -83,8 +85,11 @@ int main(void)
 			c.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
 		},
 		Game::LoadNormalShader,
-		Game::LoadTextureShader
+		Game::LoadTextureShader,
+		Game::LoadTextureSpriteShader
 	);
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::InitPlayerContactCallback);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
 	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(Game::SaveGameState);
