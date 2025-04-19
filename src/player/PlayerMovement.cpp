@@ -12,13 +12,13 @@ static glm::vec3 GetPlayerMovementForce(ES::Engine::Core &core)
     glm::vec3 force(0.0f, 0.0f, 0.0f);
     auto &input = core.GetResource<ES::Plugin::Input::Resource::InputManager>();
 
-    if (input.IsKeyPressed(GLFW_KEY_Z)) {
+    if (input.IsKeyPressed(GLFW_KEY_W)) {
         force.z += 1.0f;
     }
     if (input.IsKeyPressed(GLFW_KEY_S)) {
         force.z -= 1.0f;
     }
-    if (input.IsKeyPressed(GLFW_KEY_Q)) {
+    if (input.IsKeyPressed(GLFW_KEY_A)) {
         force.x -= 1.0f;
     }
     if (input.IsKeyPressed(GLFW_KEY_D)) {
