@@ -32,7 +32,7 @@ namespace Game {
     struct Terrain {
         std::vector<TerrainPiece> pieces;
 
-        int segmentCount = 10;
+        int segmentCount = 30;
         glm::vec3 segmentsPositionOffset{0.0f, 0.0f, 0.0f};
         glm::vec3 segmentsGapPositionOffset{0.0f, -1.26f, 20.0f};
         glm::vec3 segmentsScale{2.0f, 2.0f, 2.0f};

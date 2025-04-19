@@ -5,6 +5,7 @@
 #include "Transform.hpp"
 #include "Player.hpp"
 #include "Camera.hpp"
+#include "Terrain.hpp"
 
 #include "JoltPhysics.hpp"
 #include "OpenGL.hpp"
@@ -136,12 +137,21 @@ void Game::RespawnPlayer(ES::Engine::Core &core)
         bodyInterface.SetAngularVelocity(body->GetID(), JPH::Vec3::sZero());
     };
 
+    // Respawn is computed based on segments rotation
+    Game::Terrain terrain;
+    glm::vec3 upDir = terrain.segmentsRotation * glm::vec3(1, 0, 0);
+    float slope = upDir.y / upDir.z;
+
     core.GetRegistry()
         .view<Game::Player, ES::Plugin::Object::Component::Transform, ES::Plugin::Physics::Component::RigidBody3D>()
-        .each([&](auto entity, auto &player, auto &transform, auto &rigidbody) {
-            if (transform.position.y < -20.0f) {
+        .each([&](auto entity, auto& player, auto& transform, auto& rigidbody) {
+            float z = transform.position.z;
+            float yBase = -8.0f;
+            float yFromSlope = yBase + z * slope;
+
+            if (transform.position.y < yFromSlope) {
                 CancelMovementForce(rigidbody.body, player);
                 transform.position = initialPosition;
             }
-    });
+        });
 }
