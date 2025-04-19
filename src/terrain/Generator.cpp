@@ -50,8 +50,12 @@ Game::SegmentMetrics Game::GetSegmentMetrics(Game::TerrainType type, const glm::
     glm::vec3 delta = maxPos - minPos;
 
     float length = std::floor(std::max({delta.x, delta.y, delta.z}));
+
+    // Hardcoding the length of segments because it needs a gap
     if (type == Game::TerrainType::JumpSingle)
-        length = 40.0f; // Hardcoding the length for this segment because to needs a gap 
+        length = 40.0f;
+    else if (type == Game::TerrainType::MovingObstacleA)
+        length = 15.0f;
 
     SegmentMetrics metrics;
     metrics.lengthZ = length;
@@ -162,7 +166,7 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
         terrainEntity.AddComponent<Physics::Component::RigidBody3D>(
             core, shapeSettings, JPH::EMotionType::Static, Physics::Utils::Layers::NON_MOVING
         );
-        terrainEntity.AddComponent<Game::TerrainPiece>(core);
+        terrainEntity.AddComponent<Game::TerrainPiece>(core, piece);
         ES::Utils::Log::Info(fmt::format("Loaded terrain 3D model for {} successfully", modelPath));
     } else {
         ES::Utils::Log::Error(fmt::format("Failed to load terrain 3D model for {}", modelPath));
