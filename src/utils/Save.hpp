@@ -13,4 +13,5 @@ namespace Game
 
     void RetrieveSaveGameState(ES::Engine::Core &core);
     void SaveGameState(ES::Engine::Core &core);
+    bool TerrainExists(ES::Engine::Core &core);
 } // namespace Game

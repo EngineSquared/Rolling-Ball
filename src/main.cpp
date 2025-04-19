@@ -18,6 +18,7 @@
 #include "PointCameraToPlayer.hpp"
 #include "PlayerMovement.hpp"
 #include "PlayerJump.hpp"
+#include "InitPlayerContactCallback.hpp"
 
 #include "Generator.hpp"
 #include "Save.hpp"
@@ -87,6 +88,8 @@ int main(void)
 		Game::LoadTextureShader,
 		Game::LoadTextureSpriteShader
 	);
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::InitPlayerContactCallback);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
 	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(Game::SaveGameState);

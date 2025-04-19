@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <glm/glm.hpp>
+
 namespace Game {
     struct Player {
         // In m/s
@@ -12,5 +14,9 @@ namespace Game {
         std::chrono::time_point<std::chrono::steady_clock> lastJump;
         // Jump impulse
         float jumpImpulse{3800.0f};
+        // Terrain contacts
+        int terrainContacts{0};
+        // Finish contacts
+        int finishContacts{0};
     };
 }
