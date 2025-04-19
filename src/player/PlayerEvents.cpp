@@ -6,34 +6,23 @@
 #include "Player.hpp"
 #include "SceneManager.hpp"
 
-void Game::EntityTouchesFinish(ES::Engine::Core &core, JPH::Body *player)
-{
-    // Do we really need to check that ?
-    if (player == nullptr)
-        return;
-
-    // TODO: such logic should be implemented in ESQ, not specific to the game
-    auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
-    auto &physicsSystem = physicsManager.GetPhysicsSystem();
-
-    core.GetRegistry()
-        .view<Game::Finish, ES::Plugin::Physics::Component::RigidBody3D>()
-        .each([&physicsSystem, &player, &core](Game::Finish &finish, auto &rigidBody) {
-        if (rigidBody.body == nullptr) {
-            return;
-        }
-
-        if (physicsSystem.WereBodiesInContact(player->GetID(), rigidBody.body->GetID())) {
-            finish.OnFinish(core);
-        }
-    });
-}
-
 void Game::PlayerEvents(ES::Engine::Core &core)
 {
+    bool needsToFinish = false;
     core.GetRegistry()
-        .view<Game::Player, ES::Plugin::Physics::Component::RigidBody3D>()
-        .each([&](auto, auto &, auto &rigidBody) {
-            EntityTouchesFinish(core, rigidBody.body);
+        .view<Game::Player>()
+        .each([&](auto entity, auto &player) {
+        // TODO: should use a sensor instead, this may be buggy
+        if (player.finishContacts > 0) {
+            player.finishContacts = 0;
+            needsToFinish = true;
+        }
     });
+    core.GetRegistry()
+        .view<Game::Finish>()
+        .each([&](auto entity, auto &finish) {
+            if (needsToFinish) {
+                finish.OnFinish(core);
+            }
+        });
 }
