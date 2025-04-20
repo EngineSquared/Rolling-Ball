@@ -18,11 +18,8 @@ void LoadNormalShader(ES::Engine::Core &core)
     sp.addUniform("ModelMatrix");
     sp.addUniform("NormalMatrix");
 
-    for (int i = 0; i < 5; i++)
-    {
-        sp.addUniform(fmt::format("Light[{}].Position", i));
-        sp.addUniform(fmt::format("Light[{}].Intensity", i));
-    }
+    sp.addUniform("NumberLights");
+    sp.addSSBO("LightBuffer", 0, sizeof(ES::Plugin::OpenGL::Utils::LightInfo));
     sp.addUniform("Material.Ka");
     sp.addUniform("Material.Kd");
     sp.addUniform("Material.Ks");
@@ -34,31 +31,37 @@ void LoadNormalShader(ES::Engine::Core &core)
     glUniform3fv(sp.uniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
 	sp.disable();
 
-    std::array<OpenGL::Utils::Light, 5> light = {
-        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.0f, 0.8f, 0.8f)},
-        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.0f, 0.0f, 0.8f)},
-        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.8f, 0.0f, 0.0f)},
-        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.0f, 0.8f, 0.0f)},
-        OpenGL::Utils::Light{glm::vec4(0, 0, 0, 1), glm::vec3(0.8f, 0.8f, 0.8f)}
-    };
-
     float nbr_lights = 5.f;
     float scale = 2.f * glm::pi<float>() / nbr_lights;
 
-    light[0].position = glm::vec4(5.f * cosf(scale * 0.f), 5.f, 5.f * sinf(scale * 0.f), 1.f);
-    light[1].position = glm::vec4(5.f * cosf(scale * 1.f), 5.f, 5.f * sinf(scale * 1.f), 1.f);
-    light[2].position = glm::vec4(5.f * cosf(scale * 2.f), 5.f, 5.f * sinf(scale * 2.f), 1.f);
-    light[3].position = glm::vec4(5.f * cosf(scale * 3.f), 5.f, 5.f * sinf(scale * 3.f), 1.f);
-    light[4].position = glm::vec4(5.f * cosf(scale * 4.f), 5.f, 5.f * sinf(scale * 4.f), 1.f);
+    ES::Engine::Entity ambient_light = core.CreateEntity();
+    ambient_light.AddComponent<OpenGL::Component::ShaderHandle>(core, "normal");
+    auto &am_transform = ambient_light.AddComponent<Object::Component::Transform>(core, glm::vec3(0, 0, 0), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+    ambient_light.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::AMBIENT, glm::vec3(0.0f, 0.8f, 0.8f));
+    am_transform.position = glm::vec3(5.f * cosf(scale * 0.f), 5.f, 5.f * sinf(scale * 0.f));
 
-    sp.use();
-    for (int i = 0; i < 5; i++)
-    {
-        glUniform4fv(sp.uniform(fmt::format("Light[{}].Position", i).c_str()), 1,
-                     glm::value_ptr(light[i].position));
-        glUniform3fv(sp.uniform(fmt::format("Light[{}].Intensity", i).c_str()), 1,
-                     glm::value_ptr(light[i].intensity));
-    }
-    sp.disable();
+    ES::Engine::Entity light_1 = core.CreateEntity();
+    light_1.AddComponent<OpenGL::Component::ShaderHandle>(core, "normal");
+    auto &transform_1 = light_1.AddComponent<Object::Component::Transform>(core, glm::vec3(0, 0, 0), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+    light_1.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.0f, 0.0f, 0.8f));
+    transform_1.position = glm::vec3(5.f * cosf(scale * 1.f), 5.f, 5.f * sinf(scale * 1.f));
+
+    ES::Engine::Entity light_2 = core.CreateEntity();
+    light_2.AddComponent<OpenGL::Component::ShaderHandle>(core, "normal");
+    auto &transform_2 = light_2.AddComponent<Object::Component::Transform>(core, glm::vec3(0, 0, 0), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+    light_2.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.8f, 0.0f, 0.0f));
+    transform_2.position = glm::vec3(5.f * cosf(scale * 2.f), 5.f, 5.f * sinf(scale * 2.f));
+
+    ES::Engine::Entity light_3 = core.CreateEntity();
+    light_3.AddComponent<OpenGL::Component::ShaderHandle>(core, "normal");
+    auto &transform_3 = light_3.AddComponent<Object::Component::Transform>(core, glm::vec3(0, 0, 0), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+    light_3.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.0f, 0.8f, 0.0f));
+    transform_3.position = glm::vec3(5.f * cosf(scale * 3.f), 5.f, 5.f * sinf(scale * 3.f));
+
+    ES::Engine::Entity light_4 = core.CreateEntity();
+    light_4.AddComponent<OpenGL::Component::ShaderHandle>(core, "normal");
+    auto &transform_4 = light_4.AddComponent<Object::Component::Transform>(core, glm::vec3(0, 0, 0), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+    light_4.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.8f, 0.8f, 0.8f));
+    transform_4.position = glm::vec3(5.f * cosf(scale * 4.f), 5.f, 5.f * sinf(scale * 4.f));
 }
 }
