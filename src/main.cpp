@@ -13,6 +13,8 @@
 #include "Light.hpp"
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
+#include "Input.hpp"
+
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
 #include "PlayerMovement.hpp"
@@ -50,11 +52,9 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<OpenGL::Plugin, Physics::Plugin>();
+	core.AddPlugins<OpenGL::Plugin, Physics::Plugin, Input::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
-
-	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(ES::Plugin::Input::Resource::InputManager());
 
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::FirstLevelScene>("game_first_level");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::SecondLevelScene>("game_second_level");

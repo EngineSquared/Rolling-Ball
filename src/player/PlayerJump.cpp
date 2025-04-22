@@ -4,7 +4,7 @@
 #include "RigidBody3D.hpp"
 #include "SoftBody3D.hpp"
 #include "Player.hpp"
-#include "InputManager.hpp"
+#include "Input.hpp"
 #include "PhysicsManager.hpp"
 
 #include "Terrain.hpp"
@@ -37,18 +37,16 @@ static void ApplyJumpImpulse(ES::Engine::Core &core, JPH::Body *body, Game::Play
     if (body == nullptr) {
         return;
     }
-    auto &input = core.GetResource<ES::Plugin::Input::Resource::InputManager>();
     auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
     auto &bodyInterface = physicsManager.GetPhysicsSystem().GetBodyInterface();
-    
-    if (input.IsKeyPressed(GLFW_KEY_SPACE) && PlayerTouchesTerrain(core, body->GetID())) {
+
+    if (ES::Plugin::Input::Utils::IsKeyPressed(GLFW_KEY_SPACE) && PlayerTouchesTerrain(core, body->GetID())) {
         bodyInterface.AddImpulse(body->GetID(), JPH::Vec3(0.0f, player.jumpImpulse, 0.0f));
     }
 }
 
 void Game::PlayerJump(ES::Engine::Core &core)
 {
-    auto &input = core.GetResource<ES::Plugin::Input::Resource::InputManager>();
     auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
     auto &bodyInterface = physicsManager.GetPhysicsSystem().GetBodyInterface();
 
