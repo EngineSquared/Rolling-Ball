@@ -14,28 +14,21 @@
 #include "LightInfo.hpp"
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
-
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
 #include "PlayerMovement.hpp"
 #include "PlayerJump.hpp"
 #include "InitPlayerContactCallback.hpp"
-
 #include "Generator.hpp"
 #include "Save.hpp"
-
 #include "GameScene.hpp"
 #include "MainMenu.hpp"
 #include "Option.hpp"
 #include "EndScene.hpp"
-
 #include "LoadNormalShader.hpp"
 #include "LoadTextureShader.hpp"
 #include "LoadTextureSpriteShader.hpp"
-
 #include <iostream>
-
-// Jolt includes
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -46,7 +39,6 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
