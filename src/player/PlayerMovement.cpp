@@ -4,7 +4,7 @@
 #include "RigidBody3D.hpp"
 #include "SoftBody3D.hpp"
 #include "Player.hpp"
-#include "Input.hpp"
+#include "InputUtils.hpp"
 #include "PhysicsManager.hpp"
 
 static glm::vec3 GetPlayerMovementForce(ES::Engine::Core &core)
