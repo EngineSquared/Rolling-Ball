@@ -16,10 +16,10 @@ namespace Game
 
         auto timeElapsedText = ES::Engine::Entity::Create(core);
     
-        timeElapsedText.AddComponent<ES::Plugin::UI::Component::Text>(core, ES::Plugin::UI::Component::Text("Time elapsed: 0.0s", glm::vec2(10.0f, 10.0f), 1.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-        timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::FontHandle>(core, ES::Plugin::OpenGL::Component::FontHandle("tomorrow"));
-        timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, ES::Plugin::OpenGL::Component::ShaderHandle("textDefault"));
-        timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::TextHandle>(core, ES::Plugin::OpenGL::Component::TextHandle("timeElapsedText"));
+        timeElapsedText.AddComponent<ES::Plugin::UI::Component::Text>(core, "Time elapsed: 0.0s", glm::vec2(10.0f, 10.0f), 1.0f, ES::Plugin::Colors::Utils::WHITE_COLOR);
+        timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::FontHandle>(core, "tomorrow");
+        timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "textDefault");
+        timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::TextHandle>(core, "timeElapsedText");
     }
 
     void UpdateTextTime(ES::Engine::Core &core)

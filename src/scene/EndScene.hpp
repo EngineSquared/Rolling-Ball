@@ -46,10 +46,10 @@ namespace Game
             float elapsedTime = core.GetResource<Game::Time>().ts;
             auto timeElapsedText = ES::Engine::Entity::Create(core);
     
-            timeElapsedText.AddComponent<ES::Plugin::UI::Component::Text>(core, ES::Plugin::UI::Component::Text(fmt::format("Game Finished in: {:.2f} seconds", elapsedTime), glm::vec2(100.0f, 100.0f), 1.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-            timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::FontHandle>(core, ES::Plugin::OpenGL::Component::FontHandle("tomorrow"));
-            timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, ES::Plugin::OpenGL::Component::ShaderHandle("textDefault"));
-            timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::TextHandle>(core, ES::Plugin::OpenGL::Component::TextHandle("timeElapsedTextEnd"));
+            timeElapsedText.AddComponent<ES::Plugin::UI::Component::Text>(core, fmt::format("Game Finished in: {:.2f} seconds", elapsedTime), glm::vec2(100.0f, 100.0f), 1.0f, ES::Plugin::Colors::Utils::WHITE_COLOR);
+            timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::FontHandle>(core, "tomorrow");
+            timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "textDefault");
+            timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::TextHandle>(core, "timeElapsedTextEnd");
         }
 
         void QuitButton(ES::Engine::Core &core)
