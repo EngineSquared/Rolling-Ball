@@ -76,9 +76,9 @@ namespace Game
             };
             buttonComp.displayType =
                 ES::Plugin::UI::Component::DisplayType::Image{
-                    .normalImageID = ES::Plugin::OpenGL::Component::TextureHandle("flNormalButton"),
-                    .hoverImageID  = ES::Plugin::OpenGL::Component::TextureHandle("flHoverButton"),
-                    .pressedImageID = ES::Plugin::OpenGL::Component::TextureHandle("flPressedButton")};
+                    .normal = ES::Plugin::OpenGL::Component::TextureHandle("flNormalButton"),
+                    .hover  = ES::Plugin::OpenGL::Component::TextureHandle("flHoverButton"),
+                    .pressed = ES::Plugin::OpenGL::Component::TextureHandle("flPressedButton")};
         }
 
         // TODO: those kind of entity management should be added into scene class to allow to easely create scene contextual entities
