@@ -54,25 +54,31 @@ namespace Game
 
         void FullScreenButton(ES::Engine::Core &core)
         {
+            auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
+    		textureManager.Add(entt::hashed_string{"flNormalButton"}, "asset/textures/FullscreenNormal.png");
+    		textureManager.Add(entt::hashed_string{"flHoverButton"}, "asset/textures/FullscreenHover.png");
+    		textureManager.Add(entt::hashed_string{"flPressedButton"}, "asset/textures/FullscreenPressed.png");
             auto buttonEntity = CreateEntity();
-            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "2DDefault");
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "sprite");
             buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "buttonFullScreen");
-            auto &sprite = buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core);
+            auto &sprite = buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core, ES::Plugin::Colors::Utils::WHITE_COLOR);
             sprite.rect.size = glm::vec2(32.f, 32.f);
             auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
             int width, height;
             window.GetWindowSize(width, height);
             tr.position = glm::vec3(static_cast<float>(width) / 2.f - 16.f, static_cast<float>(height) / 2.f - 64.f, 0.f);
+            buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "flNormalButton");
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(32.f, 32.f));
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
                 c.GetResource<Window::Resource::Window>().ToggleFullscreen();
             };
             buttonComp.displayType =
-                ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::BLUE_COLOR,
-                                                                .hoverColor   = ES::Plugin::Colors::Utils::RED_COLOR,
-                                                                .pressedColor = ES::Plugin::Colors::Utils::GREEN_COLOR};
+                ES::Plugin::UI::Component::DisplayType::Image{
+                    .normal = ES::Plugin::OpenGL::Component::TextureHandle("flNormalButton"),
+                    .hover  = ES::Plugin::OpenGL::Component::TextureHandle("flHoverButton"),
+                    .pressed = ES::Plugin::OpenGL::Component::TextureHandle("flPressedButton")};
         }
 
         // TODO: those kind of entity management should be added into scene class to allow to easely create scene contextual entities
