@@ -94,17 +94,23 @@ int main(void)
         ES::Plugin::UI::System::UpdateButtonTexture
 	);
 
-	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&core](ES::Engine::Core &c) {
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &c) {
 		auto &inputManager = c.GetResource<Input::Resource::InputManager>();
-		inputManager.RegisterCharCallback([](ES::Engine::Core &, unsigned int key) {
-			std::cout << "Key pressed: " << key << std::endl;
+		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int scancode, int action, int mods) {
+			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+				glfwSetWindowShouldClose(cbCore.GetResource<Window::Resource::Window>().GetGLFWWindow(), true);
+			}
 		});
 	});
 
-	core.RunCore();
+	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(
+		[](ES::Engine::Core &c) {
+			glfwDestroyWindow(c.GetResource<Window::Resource::Window>().GetGLFWWindow());
+			glfwTerminate();
+		}
+	);
 
-    glfwDestroyWindow(core.GetResource<Window::Resource::Window>().GetGLFWWindow());
-    glfwTerminate();
+	core.RunCore();
 
     return 0;
 }
