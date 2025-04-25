@@ -18,7 +18,6 @@
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
 #include "PlayerMovement.hpp"
-#include "PlayerJump.hpp"
 #include "InitPlayerContactCallback.hpp"
 #include "Generator.hpp"
 #include "Save.hpp"
