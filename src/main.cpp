@@ -14,10 +14,11 @@
 #include "LightInfo.hpp"
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
+#include "Input.hpp"
+
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
 #include "PlayerMovement.hpp"
-#include "PlayerJump.hpp"
 #include "InitPlayerContactCallback.hpp"
 #include "Generator.hpp"
 #include "Save.hpp"
@@ -51,11 +52,9 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<OpenGL::Plugin, Physics::Plugin>();
+	core.AddPlugins<OpenGL::Plugin, Physics::Plugin, Input::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
-
-	core.RegisterResource<ES::Plugin::Input::Resource::InputManager>(ES::Plugin::Input::Resource::InputManager());
 
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::FirstLevelScene>("game_first_level");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::SecondLevelScene>("game_second_level");
@@ -95,10 +94,23 @@ int main(void)
         ES::Plugin::UI::System::UpdateButtonTexture
 	);
 
-	core.RunCore();
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &c) {
+		auto &inputManager = c.GetResource<Input::Resource::InputManager>();
+		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int scancode, int action, int mods) {
+			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+				glfwSetWindowShouldClose(cbCore.GetResource<Window::Resource::Window>().GetGLFWWindow(), true);
+			}
+		});
+	});
 
-    glfwDestroyWindow(core.GetResource<Window::Resource::Window>().GetGLFWWindow());
-    glfwTerminate();
+	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(
+		[](ES::Engine::Core &c) {
+			glfwDestroyWindow(c.GetResource<Window::Resource::Window>().GetGLFWWindow());
+			glfwTerminate();
+		}
+	);
+
+	core.RunCore();
 
     return 0;
 }

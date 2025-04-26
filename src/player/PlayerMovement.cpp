@@ -4,24 +4,23 @@
 #include "RigidBody3D.hpp"
 #include "SoftBody3D.hpp"
 #include "Player.hpp"
-#include "InputManager.hpp"
+#include "InputUtils.hpp"
 #include "PhysicsManager.hpp"
 
 static glm::vec3 GetPlayerMovementForce(ES::Engine::Core &core)
 {
     glm::vec3 force(0.0f, 0.0f, 0.0f);
-    auto &input = core.GetResource<ES::Plugin::Input::Resource::InputManager>();
 
-    if (input.IsKeyPressed(GLFW_KEY_W)) {
+    if (ES::Plugin::Input::Utils::IsKeyPressed(GLFW_KEY_W)) {
         force.z += 1.0f;
     }
-    if (input.IsKeyPressed(GLFW_KEY_S)) {
+    if (ES::Plugin::Input::Utils::IsKeyPressed(GLFW_KEY_S)) {
         force.z -= 1.0f;
     }
-    if (input.IsKeyPressed(GLFW_KEY_A)) {
+    if (ES::Plugin::Input::Utils::IsKeyPressed(GLFW_KEY_A)) {
         force.x -= 1.0f;
     }
-    if (input.IsKeyPressed(GLFW_KEY_D)) {
+    if (ES::Plugin::Input::Utils::IsKeyPressed(GLFW_KEY_D)) {
         force.x += 1.0f;
     }
 
@@ -34,7 +33,6 @@ static glm::vec3 GetPlayerMovementForce(ES::Engine::Core &core)
 
 void Game::PlayerMovement(ES::Engine::Core &core)
 {
-    auto &input = core.GetResource<ES::Plugin::Input::Resource::InputManager>();
     auto &camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
     auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
     auto &bodyInterface = physicsManager.GetPhysicsSystem().GetBodyInterface();
@@ -57,7 +55,7 @@ void Game::PlayerMovement(ES::Engine::Core &core)
         force.z *= player.acceleration.z;
 
         bodyInterface.AddForce(body->GetID(), JPH::Vec3(force.x, 0.0f, force.z));
-        
+    
         auto linearVelocity = body->GetLinearVelocity();
         linearVelocity.SetX(glm::clamp(linearVelocity.GetX(), -player.maxSpeed.x, player.maxSpeed.x));
         linearVelocity.SetZ(glm::clamp(linearVelocity.GetZ(), -player.maxSpeed.z, player.maxSpeed.z));
