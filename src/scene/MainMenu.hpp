@@ -38,9 +38,8 @@ namespace Game
             sprite.rect.size = glm::vec2(128.f, 32.f);
             auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
-            int width, height;
-            window.GetWindowSize(width, height);
-            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f + 32.f, 0.f);
+            glm::ivec2 size = window.GetSize();
+            tr.position = glm::vec3(static_cast<float>(size.x) / 2.f - 64.f, static_cast<float>(size.y) / 2.f + 32.f, 0.f);
             buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "startButton");
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
@@ -65,9 +64,8 @@ namespace Game
             sprite.rect.size = glm::vec2(128.f, 32.f);
             auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
-            int width, height;
-            window.GetWindowSize(width, height);
-            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f - 16.f, 0.f);
+            glm::ivec2 size = window.GetSize();
+            tr.position = glm::vec3(static_cast<float>(size.x) / 2.f - 64.f, static_cast<float>(size.y) / 2.f - 16.f, 0.f);
             buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "optionButton");
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
@@ -91,9 +89,8 @@ namespace Game
             sprite.rect.size = glm::vec2(128.f, 32.f);
             auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
-            int width, height;
-            window.GetWindowSize(width, height);
-            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f - (16.f * 2.f + 32.f), 0.f);
+            glm::ivec2 size = window.GetSize();
+            tr.position = glm::vec3(static_cast<float>(size.x) / 2.f - 64.f, static_cast<float>(size.y) / 2.f - (16.f * 2.f + 32.f), 0.f);
             buttonEntity.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "quitButton");
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             sprite.rect.size = glm::vec2(128.f, 32.f);

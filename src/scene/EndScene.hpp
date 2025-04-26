@@ -62,9 +62,8 @@ namespace Game
             sprite.color = ES::Plugin::Colors::Utils::BLUE_COLOR;
             auto &tr = buttonEntity.AddComponent<ES::Plugin::Object::Component::Transform>(core);
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
-            int width, height;
-            window.GetWindowSize(width, height);
-            tr.position = glm::vec3(static_cast<float>(width) / 2.f - 64.f, static_cast<float>(height) / 2.f - 16.f, 0.f);
+            glm::ivec2 size = window.GetSize();
+            tr.position = glm::vec3(static_cast<float>(size.x) / 2.f - 64.f, static_cast<float>(size.y) / 2.f - 16.f, 0.f);
             buttonEntity.AddComponent<ES::Plugin::UI::Component::BoxCollider2D>(core, glm::vec2(128.f, 32.f));
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
