@@ -1,6 +1,6 @@
 #include "Scene.hpp"
 
-#include "PlayerJump.hpp"
+#include "AddPlayerJumpCallback.hpp"
 #include "PlayerMovement.hpp"
 #include "PlayerEvents.hpp"
 #include "PointCameraToPlayer.hpp"
@@ -62,11 +62,11 @@ namespace Game
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
                 Game::UpdateTime,
                 Game::UpdateTextTime,
-                Game::PlayerJump,
                 Game::PlayerEvents,
                 Game::MoveSegmentsSideway,
                 Game::MoveSegmentsSquish
             );
+            Game::AddPlayerJumpCallback(core);
             core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
                 Game::PointCameraToPlayer,
                 Game::PlayerMovement
