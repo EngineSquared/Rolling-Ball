@@ -28,6 +28,7 @@
 #include "LoadNormalShader.hpp"
 #include "LoadTextureShader.hpp"
 #include "LoadTextureSpriteShader.hpp"
+#include "PlayerJumpController.hpp"
 #include <iostream>
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
@@ -80,6 +81,8 @@ int main(void)
 		Game::LoadTextureSpriteShader
 	);
 
+	core.RegisterSystem<ES::Engine::Scheduler::Update>(Game::PlayerJumpController);
+
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::InitPlayerContactCallback);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
@@ -94,6 +97,8 @@ int main(void)
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &c) {
+		ES::Plugin::Input::Utils::PrintAvailableControllers();
+
 		auto &inputManager = c.GetResource<Input::Resource::InputManager>();
 		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int scancode, int action, int mods) {
 			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
