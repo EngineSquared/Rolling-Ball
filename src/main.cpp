@@ -13,7 +13,10 @@
 #include "Light.hpp"
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
+#include "SoundManager.hpp"
+#include "Sounds.hpp"
 #include "Input.hpp"
+#include "InitSound.hpp"
 
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
@@ -54,6 +57,7 @@ int main(void)
 	core.AddPlugins<OpenGL::Plugin, Physics::Plugin, Input::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
+	core.RegisterResource<ES::Plugin::Sound::Resource::SoundManager>(ES::Plugin::Sound::Resource::SoundManager());
 
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::FirstLevelScene>("game_first_level");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::SecondLevelScene>("game_second_level");
@@ -81,7 +85,9 @@ int main(void)
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::InitPlayerContactCallback);
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Sound::System::InitSounds);
 
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RegisterGameSounds);
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
 	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(Game::SaveGameState);
 
