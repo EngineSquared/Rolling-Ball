@@ -17,6 +17,7 @@
 #include "UpdateTime.hpp"
 #include "OpenGL.hpp"
 #include "Events.hpp"
+#include "SoundManager.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -78,10 +79,15 @@ namespace Game
             auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
             textureManager.Add(entt::hashed_string{"default"}, "asset/textures/default.png");
             _entitiesToKill.push_back(Game::SpawnPlayer(core));
+            auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
+            soundManager.SetVolume("ambient_music", 0.4f);
+            soundManager.SetLoopPoints("ambient_music", 10.0f, 131.0f);
+            soundManager.Play("ambient_music");
         }
 
         void _onDestroy(ES::Engine::Core &core) final
         {
+            core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Stop("ambient_music");
             for (auto entity : _entitiesToKill) {
                 if (entity.IsValid()) {
                     entity.Destroy(core);
@@ -106,10 +112,12 @@ namespace Game
                 };
                 _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
                 _entitiesToKill.push_back(Game::SpawnPlayer(core));
+                core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("ambient_music");
             }
 
         void _onDestroy(ES::Engine::Core &core) final
             {
+                core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Stop("ambient_music");
                 for (auto entity : _entitiesToKill) {
                     if (entity.IsValid()) {
                         entity.Destroy(core);
