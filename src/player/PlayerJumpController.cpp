@@ -41,7 +41,7 @@ void Game::PlayerJumpController(ES::Engine::Core &core)
                     ApplyJumpImpulse(core, softBody.body, player);
                 });
         }
-    } catch (const ES::Plugin::Input::InputError &e) {
+    } catch (const ES::Plugin::Input::InputError &) {
         return;
     }
 }

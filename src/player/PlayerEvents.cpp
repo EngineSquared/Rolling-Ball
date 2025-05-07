@@ -11,7 +11,7 @@ void Game::PlayerEvents(ES::Engine::Core &core)
     bool needsToFinish = false;
     core.GetRegistry()
         .view<Game::Player>()
-        .each([&](auto entity, auto &player) {
+        .each([&](auto, auto &player) {
         // TODO: should use a sensor instead, this may be buggy
         if (player.finishContacts > 0) {
             player.finishContacts = 0;
@@ -20,7 +20,7 @@ void Game::PlayerEvents(ES::Engine::Core &core)
     });
     core.GetRegistry()
         .view<Game::Finish>()
-        .each([&](auto entity, auto &finish) {
+        .each([&](auto, auto &finish) {
             if (needsToFinish) {
                 finish.OnFinish(core);
             }

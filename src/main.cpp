@@ -55,7 +55,7 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<OpenGL::Plugin, Physics::Plugin, Input::Plugin>();
+	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
 	core.RegisterResource<ES::Plugin::Sound::Resource::SoundManager>(ES::Plugin::Sound::Resource::SoundManager());
@@ -106,7 +106,7 @@ int main(void)
 		ES::Plugin::Input::Utils::PrintAvailableControllers();
 
 		auto &inputManager = c.GetResource<Input::Resource::InputManager>();
-		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int scancode, int action, int mods) {
+		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int, int action, int) {
 			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 				glfwSetWindowShouldClose(cbCore.GetResource<Window::Resource::Window>().GetGLFWWindow(), true);
 			}

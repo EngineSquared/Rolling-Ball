@@ -50,10 +50,10 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
         uint64_t key = (uint64_t)std::min(v1, v2) << 32 | std::max(v1, v2);
         if (midpoints.count(key)) return midpoints[key];
         glm::vec3 mid = glm::normalize(vertices[v1] + vertices[v2]) * radius;
-        int index = vertices.size();
+        size_t index = vertices.size();
         vertices.push_back(mid);
-        midpoints[key] = index;
-        return index;
+        midpoints[key] = static_cast<int>(index);
+        return static_cast<int>(index);
     };
 
     for (int i = 0; i < subdivisionLevel; ++i) {
@@ -84,9 +84,9 @@ static ES::Engine::Entity CreateSphere(ES::Engine::Core &core, bool isSoftBody, 
     mesh.texCoords.resize(mesh.vertices.size());
     for (size_t i = 0; i < mesh.vertices.size(); ++i) {
         const auto& vertex = mesh.vertices[i];
-        float u = 0.5f + atan2(vertex.z, vertex.x) / (2.0f * std::numbers::pi);
-        float v = 0.5f - asin(vertex.y / radius) / std::numbers::pi;
-        mesh.texCoords[i] = glm::vec2(u, v);
+        double u = 0.5f + atan2(vertex.z, vertex.x) / (2.0f * std::numbers::pi);
+        double v = 0.5f - asin(vertex.y / radius) / std::numbers::pi;
+        mesh.texCoords[i] = glm::vec2(static_cast<float>(u), static_cast<float>(v));
     }
 
     ES::Engine::Entity sphere = core.CreateEntity();
@@ -128,7 +128,7 @@ void Game::RespawnPlayer(ES::Engine::Core &core)
     auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
     auto &bodyInterface = physicsManager.GetPhysicsSystem().GetBodyInterface();
 
-    auto CancelMovementForce = [&](auto &body, Game::Player &player) {
+    auto CancelMovementForce = [&](auto &body, Game::Player &) {
         if (body == nullptr) {
             return;
         }
@@ -144,7 +144,7 @@ void Game::RespawnPlayer(ES::Engine::Core &core)
 
     core.GetRegistry()
         .view<Game::Player, ES::Plugin::Object::Component::Transform, ES::Plugin::Physics::Component::RigidBody3D>()
-        .each([&](auto entity, auto& player, auto& transform, auto& rigidbody) {
+        .each([&](auto, auto& player, auto& transform, auto& rigidbody) {
             float z = transform.position.z;
             float yBase = -8.0f;
             float yFromSlope = yBase + z * slope;
