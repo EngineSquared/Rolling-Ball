@@ -14,7 +14,7 @@ void Game::MoveSegmentsSideway(ES::Engine::Core &core)
 
     core.GetRegistry()
         .view<Game::TerrainPiece, ES::Plugin::Physics::Component::RigidBody3D, ES::Plugin::Object::Component::Transform>()
-        .each([&](Game::TerrainPiece &entity, auto &rigidBody, auto &transform) {
+        .each([&](Game::TerrainPiece &entity, auto &, auto &transform) {
             if (entity.type == Game::TerrainType::MovingObstacleA) {
                 float baseX = entity.position.x;
                 float xOffset = amplitude * std::sin(frequency * time);
@@ -36,7 +36,7 @@ void Game::MoveSegmentsSquish(ES::Engine::Core &core)
 
     core.GetRegistry()
         .view<Game::TerrainPiece, ES::Plugin::Physics::Component::RigidBody3D, ES::Plugin::Object::Component::Transform>()
-        .each([&](Game::TerrainPiece &entity, auto &rigidBody, auto &transform) {
+        .each([&](Game::TerrainPiece &entity, auto &, auto &transform) {
             if (entity.type == Game::TerrainType::MovingObstacleB) {
                 float normalizedSin = (std::sin(frequency * time) + 1.0f) / 2.0f;
                 float scaledZ = minScale + (maxScale - minScale) * normalizedSin;

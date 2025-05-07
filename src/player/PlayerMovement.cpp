@@ -7,7 +7,7 @@
 #include "InputUtils.hpp"
 #include "PhysicsManager.hpp"
 
-static glm::vec3 GetPlayerKeyboardMovementForce(ES::Engine::Core &core)
+static glm::vec3 GetPlayerKeyboardMovementForce()
 {
     glm::vec3 force(0.0f, 0.0f, 0.0f);
 
@@ -32,7 +32,7 @@ static glm::vec3 GetPlayerKeyboardMovementForce(ES::Engine::Core &core)
 }
 
 // Works on PS5 controller, untested on other controllers
-static glm::vec3 GetPlayerJoystickMovementForce(ES::Engine::Core &core, int joystickID)
+static glm::vec3 GetPlayerJoystickMovementForce(int joystickID)
 {
     glm::vec3 force(0.0f);
 
@@ -43,7 +43,7 @@ static glm::vec3 GetPlayerJoystickMovementForce(ES::Engine::Core &core, int joys
     ES::Plugin::Input::Utils::JoystickAxes axes;
     try {
         axes = ES::Plugin::Input::Utils::GetJoystickAxes(joystickID);
-    } catch (const ES::Plugin::Input::InputError &e) {
+    } catch (const ES::Plugin::Input::InputError &) {
         return force;
     }
 
@@ -69,8 +69,8 @@ void Game::PlayerMovement(ES::Engine::Core &core)
     auto &physicsManager = core.GetResource<ES::Plugin::Physics::Resource::PhysicsManager>();
     auto &bodyInterface = physicsManager.GetPhysicsSystem().GetBodyInterface();
 
-    glm::vec3 keyboardForce = GetPlayerKeyboardMovementForce(core);
-    glm::vec3 joystickForce = GetPlayerJoystickMovementForce(core, 0);
+    glm::vec3 keyboardForce = GetPlayerKeyboardMovementForce();
+    glm::vec3 joystickForce = GetPlayerJoystickMovementForce(0);
 
     if (glm::length(keyboardForce) == 0.0f && glm::length(joystickForce) == 0.0f) {
         return;
@@ -97,11 +97,11 @@ void Game::PlayerMovement(ES::Engine::Core &core)
         bodyInterface.SetLinearVelocity(body->GetID(), linearVelocity);
     };
 
-    core.GetRegistry().view<Game::Player, ES::Plugin::Physics::Component::RigidBody3D>().each([&](auto entity, auto &player, auto &rigidBody) {
+    core.GetRegistry().view<Game::Player, ES::Plugin::Physics::Component::RigidBody3D>().each([&](auto, auto &player, auto &rigidBody) {
         ApplyMovementForce(rigidBody.body, player);
     });
 
-    core.GetRegistry().view<Game::Player, ES::Plugin::Physics::Component::SoftBody3D>().each([&](auto entity, auto &player, auto &softBody) {
+    core.GetRegistry().view<Game::Player, ES::Plugin::Physics::Component::SoftBody3D>().each([&](auto, auto &player, auto &softBody) {
         ApplyMovementForce(softBody.body, player);
     });
 }
