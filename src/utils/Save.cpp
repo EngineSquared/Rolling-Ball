@@ -21,7 +21,7 @@ bool Game::TerrainExists(ES::Engine::Core &core)
     return false;
 }
 
-void Game::RetrieveSaveGameState(ES::Engine::Core &core)
+void Game::RetrieveSaveGameState(ES::Engine::Core &)
 {
     if (!std::filesystem::exists(SAVE_FILENAME))
         return;

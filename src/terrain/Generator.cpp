@@ -22,6 +22,30 @@
 
 using namespace ES::Plugin;
 
+static const std::string GetModelPathFromTerrainType(const Game::TerrainType type) {
+    static const std::unordered_map<Game::TerrainType, std::string> modelPaths = {
+        {Game::TerrainType::Flat, "asset/models/straight.obj"},
+        {Game::TerrainType::Ramp, "asset/models/ramp.obj"},
+        {Game::TerrainType::CurveLeft, "asset/models/curve_left.obj"},
+        {Game::TerrainType::CurveRight, "asset/models/curve_right.obj"},
+        {Game::TerrainType::Wave, "asset/models/wave.obj"},
+        {Game::TerrainType::Jump, "asset/models/jump.obj"},
+        {Game::TerrainType::JumpSingle, "asset/models/jump_single.obj"},
+        {Game::TerrainType::ObstacleA, "asset/models/obstacle1.obj"},
+        {Game::TerrainType::ObstacleB, "asset/models/obstacle2.obj"},
+        {Game::TerrainType::ObstacleC, "asset/models/obstacle3.obj"},
+        {Game::TerrainType::MovingObstacleA, "asset/models/moving_obstacle1.obj"},
+        {Game::TerrainType::MovingObstacleB, "asset/models/moving_obstacle2.obj"},
+        {Game::TerrainType::Finish, "asset/models/finish.obj"},
+    };
+
+    auto it = modelPaths.find(type);
+    if (it != modelPaths.end()) {
+        return it->second;
+    }
+    return "asset/models/straight.obj"; // Default fallback
+}
+
 Game::SegmentMetrics Game::GetSegmentMetrics(Game::TerrainType type, const glm::vec3 &scale, const glm::quat &rotation)
 {
     if (cachedMetrics.contains(type))

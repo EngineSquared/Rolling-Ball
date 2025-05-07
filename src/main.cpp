@@ -14,7 +14,10 @@
 #include "LightInfo.hpp"
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
+#include "SoundManager.hpp"
+#include "Sounds.hpp"
 #include "Input.hpp"
+#include "InitSound.hpp"
 
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
@@ -29,6 +32,7 @@
 #include "LoadNormalShader.hpp"
 #include "LoadTextureShader.hpp"
 #include "LoadTextureSpriteShader.hpp"
+#include "PlayerJumpController.hpp"
 #include <iostream>
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
@@ -52,9 +56,10 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<OpenGL::Plugin, Physics::Plugin, Input::Plugin>();
+	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
+	core.RegisterResource<ES::Plugin::Sound::Resource::SoundManager>(ES::Plugin::Sound::Resource::SoundManager());
 
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::FirstLevelScene>("game_first_level");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::SecondLevelScene>("game_second_level");
@@ -81,8 +86,12 @@ int main(void)
 		Game::LoadTextureSpriteShader
 	);
 
-	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::InitPlayerContactCallback);
+	core.RegisterSystem<ES::Engine::Scheduler::Update>(Game::PlayerJumpController);
 
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::InitPlayerContactCallback);
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Sound::System::InitSounds);
+
+	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RegisterGameSounds);
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
 	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(Game::SaveGameState);
 
@@ -95,8 +104,10 @@ int main(void)
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &c) {
+		ES::Plugin::Input::Utils::PrintAvailableControllers();
+
 		auto &inputManager = c.GetResource<Input::Resource::InputManager>();
-		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int scancode, int action, int mods) {
+		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int, int action, int) {
 			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 				glfwSetWindowShouldClose(cbCore.GetResource<Window::Resource::Window>().GetGLFWWindow(), true);
 			}

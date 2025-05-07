@@ -1,4 +1,4 @@
-add_requires("entt", "gtest", "glm >=1.0.1", "glfw >=3.4", "glew", "spdlog", "fmt", "stb", "joltphysics")
+add_requires("entt", "gtest", "glm >=1.0.1", "glfw >=3.4", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
 
 set_project("JoltPhysics-Test")
 set_languages("c++20")
@@ -27,7 +27,7 @@ target("RollingBall")
     add_includedirs("$(projectdir)/src/utils")
     add_includedirs("$(projectdir)/src/ui")
 
-    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics")
+    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
 
     set_rundir("$(projectdir)")
 

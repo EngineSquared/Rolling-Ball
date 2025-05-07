@@ -45,6 +45,7 @@ namespace Game
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
                 c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_first_level");
+                c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("button_click");
             };
             
             buttonComp.displayType =
@@ -71,6 +72,7 @@ namespace Game
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
                 c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("option");
+                c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("button_click");
             };
             buttonComp.displayType =
                 ES::Plugin::UI::Component::DisplayType::TintColor{.normalColor  = ES::Plugin::Colors::Utils::WHITE_COLOR,
@@ -96,6 +98,7 @@ namespace Game
             sprite.rect.size = glm::vec2(128.f, 32.f);
             auto &buttonComp = buttonEntity.AddComponent<ES::Plugin::UI::Component::Button>(core);
             buttonComp.onClick = [&](ES::Engine::Core &c) {
+                c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("button_click");
                 c.Stop();
             };
             buttonComp.displayType =
