@@ -32,17 +32,19 @@ void main() {
 
     for (int i = 0; i < NumberLights; i++) {
         int type = int(Light[i].Position.w);
+        vec3 pos = Light[i].Position.xyz;
+        vec3 colour = Light[i].Colour.rgb;
 
         if (type == 0) { // Point light
-            vec3 L = normalize(Light[i].Position.xyz - Position);
+            vec3 L = normalize(pos - Position);
             vec3 V = normalize(CamPos - Position);
             vec3 HalfwayVector = normalize(V + L);
 
-            vec3 diffuse = Material.Kd * Light[i].Colour.rgb * max(dot(L, Normal), 0.0);
-            vec3 specular = Material.Ks * Light[i].Colour.rgb * pow(max(dot(HalfwayVector, Normal), 0.0), Material.Shiness);
+            vec3 diffuse = Material.Kd * colour * max(dot(L, Normal), 0.0);
+            vec3 specular = Material.Ks * colour * pow(max(dot(HalfwayVector, Normal), 0.0), Material.Shiness);
             finalColor += diffuse + specular;
         } else if (type == 1) { // Ambient light
-            ambient += Material.Ka * Light[i].Colour.rgb;
+            ambient += Material.Ka * colour;
         }
     }
 
