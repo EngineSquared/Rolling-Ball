@@ -11,6 +11,7 @@
 #include "Window.hpp"
 #include "Camera.hpp"
 #include "Light.hpp"
+#include "LightInfo.hpp"
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
 #include "SoundManager.hpp"
