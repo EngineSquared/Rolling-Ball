@@ -85,11 +85,11 @@ namespace Game
             soundManager.SetLoopPoints("ambient_music", 10.0f, 131.0f);
             soundManager.Play("ambient_music");
 
-            addLights(core, "default");
-            addLights(core, "texture");
+            AddLights(core, "default");
+            AddLights(core, "texture");
         }
 
-        void addLights(ES::Engine::Core &core, const std::string &shaderName)
+        void AddLights(ES::Engine::Core &core, const std::string &shaderName)
         {
             float nbr_lights = 5.f;
             float scale = 2.f * glm::pi<float>() / nbr_lights;
@@ -97,31 +97,31 @@ namespace Game
             ES::Engine::Entity ambient_light = core.CreateEntity();
             ambient_light.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
             auto &am_transform = ambient_light.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-            ambient_light.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::AMBIENT, glm::vec3(0.0f, 0.8f, 0.8f));
+            ambient_light.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::AMBIENT, glm::vec3(0.0f, 0.8f, 0.8f));
             am_transform.position = glm::vec3(5.f * cosf(scale * 0.f), 5.f, 5.f * sinf(scale * 0.f));
 
             ES::Engine::Entity light_1 = core.CreateEntity();
             light_1.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
             auto &transform_1 = light_1.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-            light_1.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.0f, 0.0f, 0.8f));
+            light_1.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.0f, 0.0f, 0.8f));
             transform_1.position = glm::vec3(5.f * cosf(scale * 1.f), 5.f, 5.f * sinf(scale * 1.f));
 
             ES::Engine::Entity light_2 = core.CreateEntity();
             light_2.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
             auto &transform_2 = light_2.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-            light_2.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.8f, 0.0f, 0.0f));
+            light_2.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.8f, 0.0f, 0.0f));
             transform_2.position = glm::vec3(5.f * cosf(scale * 2.f), 5.f, 5.f * sinf(scale * 2.f));
 
             ES::Engine::Entity light_3 = core.CreateEntity();
             light_3.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
             auto &transform_3 = light_3.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-            light_3.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.0f, 0.8f, 0.0f));
+            light_3.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.0f, 0.8f, 0.0f));
             transform_3.position = glm::vec3(5.f * cosf(scale * 3.f), 5.f, 5.f * sinf(scale * 3.f));
 
             ES::Engine::Entity light_4 = core.CreateEntity();
             light_4.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
             auto &transform_4 = light_4.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-            light_4.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.8f, 0.8f, 0.8f));
+            light_4.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.8f, 0.8f, 0.8f));
             transform_4.position = glm::vec3(5.f * cosf(scale * 4.f), 5.f, 5.f * sinf(scale * 4.f));
 
             _entitiesToKill.insert(_entitiesToKill.end(), {ambient_light, light_1, light_2, light_3, light_4});
@@ -155,12 +155,12 @@ namespace Game
                 _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
                 _entitiesToKill.push_back(Game::SpawnPlayer(core));
 
-                addLights(core, "default");
-                addLights(core, "texture");
+                AddLights(core, "default");
+                AddLights(core, "texture");
                 core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("ambient_music");
             }
 
-            void addLights(ES::Engine::Core &core, const std::string &shaderName)
+            void AddLights(ES::Engine::Core &core, const std::string &shaderName)
             {
                 float nbr_lights = 5.f;
                 float scale = 2.f * glm::pi<float>() / nbr_lights;
@@ -168,31 +168,31 @@ namespace Game
                 ES::Engine::Entity ambient_light = core.CreateEntity();
                 ambient_light.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
                 auto &am_transform = ambient_light.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-                ambient_light.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::AMBIENT, glm::vec3(0.0f, 0.8f, 0.8f));
+                ambient_light.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::AMBIENT, glm::vec3(0.0f, 0.8f, 0.8f));
                 am_transform.position = glm::vec3(5.f * cosf(scale * 0.f), 5.f, 5.f * sinf(scale * 0.f));
 
                 ES::Engine::Entity light_1 = core.CreateEntity();
                 light_1.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
                 auto &transform_1 = light_1.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-                light_1.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.0f, 0.0f, 0.8f));
+                light_1.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.0f, 0.0f, 0.8f));
                 transform_1.position = glm::vec3(5.f * cosf(scale * 1.f), 5.f, 5.f * sinf(scale * 1.f));
 
                 ES::Engine::Entity light_2 = core.CreateEntity();
                 light_2.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
                 auto &transform_2 = light_2.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-                light_2.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.8f, 0.0f, 0.0f));
+                light_2.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.8f, 0.0f, 0.0f));
                 transform_2.position = glm::vec3(5.f * cosf(scale * 2.f), 5.f, 5.f * sinf(scale * 2.f));
 
                 ES::Engine::Entity light_3 = core.CreateEntity();
                 light_3.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
                 auto &transform_3 = light_3.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-                light_3.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.0f, 0.8f, 0.0f));
+                light_3.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.0f, 0.8f, 0.0f));
                 transform_3.position = glm::vec3(5.f * cosf(scale * 3.f), 5.f, 5.f * sinf(scale * 3.f));
 
                 ES::Engine::Entity light_4 = core.CreateEntity();
                 light_4.AddComponent<OpenGL::Component::ShaderHandle>(core, shaderName);
                 auto &transform_4 = light_4.AddComponent<Object::Component::Transform>(core, glm::vec3(0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-                light_4.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::TYPE::POINT, glm::vec3(0.8f, 0.8f, 0.8f));
+                light_4.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(0.8f, 0.8f, 0.8f));
                 transform_4.position = glm::vec3(5.f * cosf(scale * 4.f), 5.f, 5.f * sinf(scale * 4.f));
 
                 _entitiesToKill.insert(_entitiesToKill.end(), {ambient_light, light_1, light_2, light_3, light_4});
