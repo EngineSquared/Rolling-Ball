@@ -13,11 +13,11 @@ void LoadTextureSpriteShader(ES::Engine::Core &core)
 	auto &shaderManager = core.GetResource<OpenGL::Resource::ShaderManager>();
     OpenGL::Utils::ShaderProgram &sp = shaderManager.Add("sprite"_hs);
     sp.Create();
-    sp.initFromFiles(vertexShader, fragmentShader);
-    sp.addUniform("texture0");
-	
-    sp.addUniform("color");
-    sp.addUniform("model");
-    sp.addUniform("projection");
+    sp.InitFromFiles(vertexShader, fragmentShader);
+    sp.AddUniform("texture0");
+
+    sp.AddUniform("color");
+    sp.AddUniform("model");
+    sp.AddUniform("projection");
 }
 }
