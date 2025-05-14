@@ -114,13 +114,6 @@ int main(void)
 		});
 	});
 
-	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(
-		[](ES::Engine::Core &c) {
-			glfwDestroyWindow(c.GetResource<Window::Resource::Window>().GetGLFWWindow());
-			glfwTerminate();
-		}
-	);
-
 	core.RunCore();
 
     return 0;
