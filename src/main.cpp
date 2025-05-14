@@ -109,17 +109,10 @@ int main(void)
 		auto &inputManager = c.GetResource<Input::Resource::InputManager>();
 		inputManager.RegisterKeyCallback([](ES::Engine::Core &cbCore, int key, int, int action, int) {
 			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-				glfwSetWindowShouldClose(cbCore.GetResource<Window::Resource::Window>().GetGLFWWindow(), true);
+				cbCore.Stop();
 			}
 		});
 	});
-
-	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(
-		[](ES::Engine::Core &c) {
-			glfwDestroyWindow(c.GetResource<Window::Resource::Window>().GetGLFWWindow());
-			glfwTerminate();
-		}
-	);
 
 	core.RunCore();
 
