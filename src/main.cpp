@@ -46,11 +46,72 @@
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "RenderingPipeline.hpp"
 
 using namespace JPH; // NOT RECOMMENDED
 
 using namespace JPH::literals;
 using namespace ES::Plugin;
+
+void LoadTextureShadowShader(ES::Engine::Core &core)
+{
+	// This "using" allow to use "_hs" compile time hashing for strings
+	using namespace entt;
+	const std::string vertexShader = "asset/shader/textureShadow/textureShadow.vs";
+	const std::string fragmentShader = "asset/shader/textureShadow/textureShadow.fs";
+	auto &shaderManager = core.GetResource<OpenGL::Resource::ShaderManager>();
+    OpenGL::Utils::ShaderProgram &sp = shaderManager.Add("textureShadow"_hs);
+    sp.Create();
+    sp.InitFromFiles(vertexShader, fragmentShader);
+    sp.AddUniform("texture0");
+	sp.AddUniform("lightSpaceMatrix");
+	sp.AddUniform("MVP");
+    sp.AddUniform("ModelMatrix");
+    sp.AddUniform("NormalMatrix");
+
+    sp.AddUniform("NumberLights");
+    sp.AddSSBO("LightBuffer", 0, sizeof(ES::Plugin::OpenGL::Utils::LightInfo));
+    sp.AddUniform("Material.Ka");
+    sp.AddUniform("Material.Kd");
+    sp.AddUniform("Material.Ks");
+    sp.AddUniform("Material.Shiness");
+
+    sp.AddUniform("CamPos");
+
+	sp.Use();
+	float near_plane = 1.0f, far_plane = 7.5f;
+	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), 
+							glm::vec3( 0.0f, 0.0f,  0.0f), 
+							glm::vec3( 0.0f, 1.0f,  0.0f));
+	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+	glUniformMatrix4fv(sp.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+    glUniform3fv(sp.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
+	sp.Disable();
+}
+
+void LoadShadowShader(ES::Engine::Core &core)
+{
+	// This "using" allow to use "_hs" compile time hashing for strings
+	using namespace entt;
+	const std::string vertexShader = "asset/shader/shadow/shadow.vs";
+	const std::string fragmentShader = "asset/shader/shadow/shadow.fs";
+	auto &shaderManager = core.GetResource<OpenGL::Resource::ShaderManager>();
+    OpenGL::Utils::ShaderProgram &sp = shaderManager.Add("shadow"_hs);
+    sp.Create();
+    sp.InitFromFiles(vertexShader, fragmentShader);
+   	sp.AddUniform("lightSpaceMatrix");
+	sp.AddUniform("model");
+}
+
+void BindTextureIfNeededv2(ES::Engine::Core &core, ES::Engine::Entity entity)
+{
+    ES::Plugin::OpenGL::Component::TextureHandle *textureHandle =
+        ES::Engine::Entity(entity).TryGetComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core);
+    if (textureHandle)
+        core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>().Get(textureHandle->id).Bind();
+}
 
 int main(void)
 {
@@ -68,6 +129,14 @@ int main(void)
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::EndScene>("end_scene");
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
 
+	unsigned int depthMapFBO;
+	const unsigned int SHADOW_WIDTH = 1280;
+	const unsigned int SHADOW_HEIGHT = 720;
+	unsigned int depthMap;
+
+	ES::Plugin::OpenGL::Utils::Texture texture(0, 0, 0, 0);
+
+
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
 		[](ES::Engine::Core &c) {
 			c.GetResource<Window::Resource::Window>().SetTitle("ES Rolling-Ball");
@@ -80,6 +149,48 @@ int main(void)
 			c.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
 			c.GetResource<Physics::Resource::PhysicsManager>().SetCollisionSteps(2);
 			c.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
+		},
+		LoadTextureShadowShader,
+		LoadShadowShader,
+		[&depthMapFBO, &depthMap, &texture, &SHADOW_WIDTH, &SHADOW_HEIGHT](ES::Engine::Core &core) {
+			glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity,
+				GLsizei length, const GLchar *message, const void *userParam) {
+				std::cerr << "GL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "")
+						  << " Source: " << source
+						  << ", Type: " << type
+						  << ", ID: " << id
+						  << ", Severity: " << severity
+						  << ", Message: " << message << std::endl;
+			}, 0);
+			glfwSetErrorCallback([](int error, const char *description) {
+				std::cerr << "GLFW ERROR: " << error << ": " << description << std::endl;
+			});
+			glGenFramebuffers(1, &depthMapFBO);
+			// create depth texture
+			glGenTextures(1, &depthMap);
+			std::cout << "created new texture: " << depthMap << std::endl;
+			glBindTexture(GL_TEXTURE_2D, depthMap);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			// attach depth texture as FBO's depth buffer
+			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+			glDrawBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    			std::cerr << "Framebuffer not complete!" << std::endl;
+			else 
+				std::cout << "Framebuffer complete!" << std::endl;
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			// texture = ES::Plugin::OpenGL::Utils::Texture(SHADOW_WIDTH, SHADOW_HEIGHT, 4, depthMap);
+			std::cout << "depthMap: " << depthMap << std::endl;
+			std::cout << "depthMapFBO: " << SHADOW_WIDTH << std::endl;
+			std::cout << "depthMapFBO: " << SHADOW_HEIGHT << std::endl;
+			core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>().Add(entt::hashed_string{"depthMap"}, SHADOW_WIDTH, SHADOW_HEIGHT, 1, depthMap);
 		},
 		Game::LoadNormalShader,
 		Game::LoadTextureShader,
@@ -100,7 +211,98 @@ int main(void)
         ES::Plugin::UI::System::ButtonClick,
         ES::Engine::Entity::RemoveTemporaryComponents,
         ES::Plugin::UI::System::UpdateButtonState,
-        ES::Plugin::UI::System::UpdateButtonTexture
+        ES::Plugin::UI::System::UpdateButtonTexture,
+		[](ES::Engine::Core &core){
+			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"textureShadow"});
+			shaderProgram.Use();
+			glUniform3fv(shaderProgram.GetUniform("CamPos"), 1,
+						glm::value_ptr(core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().viewer.getViewPoint()));
+			shaderProgram.Disable();
+		},
+		[](ES::Engine::Core &core){
+			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"texture"});
+			shaderProgram.Use();
+			glUniform3fv(shaderProgram.GetUniform("CamPos"), 1,
+						glm::value_ptr(core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().viewer.getViewPoint()));
+			shaderProgram.Disable();
+		}
+	);
+	bool created = false;
+	core.RegisterSystem<ES::Engine::Scheduler::Update>(
+		[&depthMapFBO, &depthMap, &created](ES::Engine::Core &core) {
+			if (core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().GetCurrentScene() != "game_first_level" || created)
+				return;
+			created = true;
+			core.RegisterSystem<ES::Plugin::RenderingPipeline::ToGPU>(
+				[&depthMapFBO, &depthMap](ES::Engine::Core &core) {
+					using namespace entt;
+					static glm::vec3 posOfLight(10.0f, 13.0f, 0.0f);
+					float near_plane = 1.0f, far_plane = 50.f;
+					glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+					glm::mat4 lightView = glm::lookAt(posOfLight, 
+										glm::vec3( 0.0f, 0.0f, 0.0f), 
+										glm::vec3( 0.0f, 1.0f,  0.0f));
+					
+					// make posOfLight rotate around the center
+					float radius = 10.0f;
+					float nbr_lights = 5.f;
+                	float scale = 2.f * glm::pi<float>() / nbr_lights;
+					// posOfLight.x = radius * cosf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
+					// posOfLight.z = radius * sinf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
+					lightView = glm::lookAt(glm::vec3(3.f, 10.f, 3.f), 
+										glm::vec3( 0.0f, 5.0f, 0.0f), 
+										glm::vec3( 0.0f, 1.0f,  0.0f));
+
+					glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+					// use depth shader
+					glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+					glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+					glClear(GL_DEPTH_BUFFER_BIT);
+
+					auto &shad = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get("shadow"_hs);
+					shad.Use();
+					glUniformMatrix4fv(shad.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+					
+					auto &view = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().view;
+					auto &projection = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().projection;
+					core.GetRegistry()
+						.view<ES::Plugin::OpenGL::Component::ModelHandle, ES::Plugin::Object::Component::Transform, ES::Plugin::Object::Component::Mesh,
+							ES::Plugin::OpenGL::Component::MaterialHandle, ES::Plugin::OpenGL::Component::ShaderHandle>()
+						.each([&](auto entity, ES::Plugin::OpenGL::Component::ModelHandle &modelHandle, ES::Plugin::Object::Component::Transform &transform,
+								ES::Plugin::Object::Component::Mesh &mesh, ES::Plugin::OpenGL::Component::MaterialHandle &materialHandle,
+								ES::Plugin::OpenGL::Component::ShaderHandle &shaderHandle) {
+							const auto &glBuffer = core.GetResource<ES::Plugin::OpenGL::Resource::GLMeshBufferManager>().Get(modelHandle.id);
+							// LoadMaterial(shader, material);
+							glm::mat4 modelmat = transform.getTransformationMatrix();
+							glm::mat4 mvp = modelmat;
+							// auto nmat = glm::mat3(glm::transpose(glm::inverse(modelmat))); // normal matrix
+							// glUniformMatrix3fv(shader.GetUniform("NormalMatrix"), 1, GL_FALSE, glm::value_ptr(nmat));
+							// glUniformMatrix4fv(shader.GetUniform("ModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelmat));
+							glUniformMatrix4fv(shad.GetUniform("model"), 1, GL_FALSE, glm::value_ptr(mvp));
+							// BindTextureIfNeededv2(core, entity);
+							glBuffer.Draw(mesh);
+						});
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+					auto cameraSize = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().size;
+					glViewport(0, 0, static_cast<int>(cameraSize.x), static_cast<int>(cameraSize.y));
+        			// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+					// glActiveTexture(GL_TEXTURE1);
+        			// glBindTexture(GL_TEXTURE_2D, depthMap);
+					
+					// glActiveTexture(GL_TEXTURE1); // Texture unit 0
+					// glBindTexture(GL_TEXTURE_2D, depthMap);
+
+					// glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+					// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+					// glActiveTexture(GL_TEXTURE0); // Texture unit 0
+					// glBindTexture(GL_TEXTURE_2D, depthMap);
+					// glEnable(GL_DEPTH_TEST);
+					// glEnable(GL_CULL_FACE);
+				}
+			);
+		}
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &c) {

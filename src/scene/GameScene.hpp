@@ -18,6 +18,7 @@
 #include "OpenGL.hpp"
 #include "Events.hpp"
 #include "SoundManager.hpp"
+#include "Window.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -80,6 +81,8 @@ namespace Game
             textureManager.Add(entt::hashed_string{"default"}, "asset/textures/default.png");
             _entitiesToKill.push_back(Game::SpawnPlayer(core));
 
+            DebugTexture(core);
+
             auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
             soundManager.SetVolume("ambient_music", 0.4f);
             soundManager.SetLoopPoints("ambient_music", 10.0f, 131.0f);
@@ -87,6 +90,7 @@ namespace Game
 
             AddLights(core, "default");
             AddLights(core, "texture");
+            AddLights(core, "textureShadow");            
         }
 
         void AddLights(ES::Engine::Core &core, const std::string &shaderName)
@@ -135,6 +139,20 @@ namespace Game
                     entity.Destroy(core);
                 }
             }
+        }
+    
+        inline void DebugTexture(ES::Engine::Core &core)
+        {
+            auto azeazez = ES::Engine::Entity::Create(core);
+            azeazez.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "sprite");
+            azeazez.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "dsfqdfqfdgsfdgsf");
+            auto &sprite = azeazez.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core, ES::Plugin::Colors::Utils::WHITE_COLOR);
+            sprite.rect.size = glm::vec2(1280.f / 2.f, 720.f / 2.f);
+            auto &tr = azeazez.AddComponent<ES::Plugin::Object::Component::Transform>(core);
+            auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
+            glm::ivec2 size = window.GetSize();
+            tr.position = glm::vec3(static_cast<float>(size.x) / 2.f, 0.f, 0.f);
+            azeazez.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "depthMap");
         }
     private:
         std::vector<ES::Engine::Entity> _entitiesToKill;
