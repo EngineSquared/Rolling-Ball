@@ -147,11 +147,11 @@ namespace Game
             azeazez.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "sprite");
             azeazez.AddComponent<ES::Plugin::OpenGL::Component::SpriteHandle>(core, "dsfqdfqfdgsfdgsf");
             auto &sprite = azeazez.AddComponent<ES::Plugin::OpenGL::Component::Sprite>(core, ES::Plugin::Colors::Utils::WHITE_COLOR);
-            sprite.rect.size = glm::vec2(1280.f / 2.f, 720.f / 2.f);
+            sprite.rect.size = glm::vec2(1280.f / 4.f, 720.f / 4.f);
             auto &tr = azeazez.AddComponent<ES::Plugin::Object::Component::Transform>(core);
             auto &window = core.GetResource<ES::Plugin::Window::Resource::Window>();
             glm::ivec2 size = window.GetSize();
-            tr.position = glm::vec3(static_cast<float>(size.x) / 2.f, 0.f, 0.f);
+            tr.position = glm::vec3(static_cast<float>(size.x) / 4.f * 3.f, 0.f, 0.f);
             azeazez.AddComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core, "depthMap");
         }
     private:

@@ -79,12 +79,25 @@ void LoadTextureShadowShader(ES::Engine::Core &core)
     sp.AddUniform("CamPos");
 
 	sp.Use();
-	float near_plane = 1.0f, far_plane = 7.5f;
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), 
-							glm::vec3( 0.0f, 0.0f,  0.0f), 
-							glm::vec3( 0.0f, 1.0f,  0.0f));
+	glm::vec3 posOfLight(10.0f, 13.0f, 0.0f);
+	float near_plane = 1.0f, far_plane = 50.f;
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, near_plane, far_plane);
+	glm::mat4 lightView = glm::lookAt(posOfLight, 
+						glm::vec3( 0.0f, 0.0f, 0.0f), 
+						glm::vec3( 0.0f, 1.0f,  0.0f));
+	
+	// make posOfLight rotate around the center
+	float radius = 10.0f;
+	float nbr_lights = 5.f;
+	float scale = 2.f * glm::pi<float>() / nbr_lights;
+	// posOfLight.x = radius * cosf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
+	// posOfLight.z = radius * sinf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
+	lightView = glm::lookAt(glm::vec3(3.f, 10.f, 3.f), 
+						glm::vec3( 0.0f, 5.0f, 0.0f), 
+						glm::vec3( 0.0f, 1.0f,  0.0f));
+
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
 	glUniformMatrix4fv(sp.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 
     glUniform3fv(sp.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
@@ -238,7 +251,7 @@ int main(void)
 					using namespace entt;
 					static glm::vec3 posOfLight(10.0f, 13.0f, 0.0f);
 					float near_plane = 1.0f, far_plane = 50.f;
-					glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+					glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, near_plane, far_plane);
 					glm::mat4 lightView = glm::lookAt(posOfLight, 
 										glm::vec3( 0.0f, 0.0f, 0.0f), 
 										glm::vec3( 0.0f, 1.0f,  0.0f));
@@ -287,19 +300,6 @@ int main(void)
 
 					auto cameraSize = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().size;
 					glViewport(0, 0, static_cast<int>(cameraSize.x), static_cast<int>(cameraSize.y));
-        			// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-					// glActiveTexture(GL_TEXTURE1);
-        			// glBindTexture(GL_TEXTURE_2D, depthMap);
-					
-					// glActiveTexture(GL_TEXTURE1); // Texture unit 0
-					// glBindTexture(GL_TEXTURE_2D, depthMap);
-
-					// glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-					// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-					// glActiveTexture(GL_TEXTURE0); // Texture unit 0
-					// glBindTexture(GL_TEXTURE_2D, depthMap);
-					// glEnable(GL_DEPTH_TEST);
-					// glEnable(GL_CULL_FACE);
 				}
 			);
 		}
