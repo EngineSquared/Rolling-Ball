@@ -90,8 +90,6 @@ void LoadTextureShadowShader(ES::Engine::Core &core)
 	float radius = 10.0f;
 	float nbr_lights = 5.f;
 	float scale = 2.f * glm::pi<float>() / nbr_lights;
-	// posOfLight.x = radius * cosf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
-	// posOfLight.z = radius * sinf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
 	lightView = glm::lookAt(glm::vec3(3.f, 10.f, 3.f), 
 						glm::vec3( 0.0f, 5.0f, 0.0f), 
 						glm::vec3( 0.0f, 1.0f,  0.0f));
@@ -116,14 +114,6 @@ void LoadShadowShader(ES::Engine::Core &core)
     sp.InitFromFiles(vertexShader, fragmentShader);
    	sp.AddUniform("lightSpaceMatrix");
 	sp.AddUniform("model");
-}
-
-void BindTextureIfNeededv2(ES::Engine::Core &core, ES::Engine::Entity entity)
-{
-    ES::Plugin::OpenGL::Component::TextureHandle *textureHandle =
-        ES::Engine::Entity(entity).TryGetComponent<ES::Plugin::OpenGL::Component::TextureHandle>(core);
-    if (textureHandle)
-        core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>().Get(textureHandle->id).Bind();
 }
 
 int main(void)
@@ -179,30 +169,19 @@ int main(void)
 				std::cerr << "GLFW ERROR: " << error << ": " << description << std::endl;
 			});
 			glGenFramebuffers(1, &depthMapFBO);
-			// create depth texture
 			glGenTextures(1, &depthMap);
-			std::cout << "created new texture: " << depthMap << std::endl;
 			glBindTexture(GL_TEXTURE_2D, depthMap);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			// attach depth texture as FBO's depth buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 			glDrawBuffer(GL_NONE);
 			glReadBuffer(GL_NONE);
-			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    			std::cerr << "Framebuffer not complete!" << std::endl;
-			else 
-				std::cout << "Framebuffer complete!" << std::endl;
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-			// texture = ES::Plugin::OpenGL::Utils::Texture(SHADOW_WIDTH, SHADOW_HEIGHT, 4, depthMap);
-			std::cout << "depthMap: " << depthMap << std::endl;
-			std::cout << "depthMapFBO: " << SHADOW_WIDTH << std::endl;
-			std::cout << "depthMapFBO: " << SHADOW_HEIGHT << std::endl;
 			core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>().Add(entt::hashed_string{"depthMap"}, SHADOW_WIDTH, SHADOW_HEIGHT, 1, depthMap);
 		},
 		Game::LoadNormalShader,
@@ -260,8 +239,6 @@ int main(void)
 					float radius = 10.0f;
 					float nbr_lights = 5.f;
                 	float scale = 2.f * glm::pi<float>() / nbr_lights;
-					// posOfLight.x = radius * cosf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
-					// posOfLight.z = radius * sinf(core.GetScheduler<ES::Plugin::RenderingPipeline::ToGPU>().GetDeltaTime() * 10.f);
 					lightView = glm::lookAt(glm::vec3(3.f, 10.f, 3.f), 
 										glm::vec3( 0.0f, 5.0f, 0.0f), 
 										glm::vec3( 0.0f, 1.0f,  0.0f));
@@ -286,14 +263,9 @@ int main(void)
 								ES::Plugin::Object::Component::Mesh &mesh, ES::Plugin::OpenGL::Component::MaterialHandle &materialHandle,
 								ES::Plugin::OpenGL::Component::ShaderHandle &shaderHandle) {
 							const auto &glBuffer = core.GetResource<ES::Plugin::OpenGL::Resource::GLMeshBufferManager>().Get(modelHandle.id);
-							// LoadMaterial(shader, material);
 							glm::mat4 modelmat = transform.getTransformationMatrix();
 							glm::mat4 mvp = modelmat;
-							// auto nmat = glm::mat3(glm::transpose(glm::inverse(modelmat))); // normal matrix
-							// glUniformMatrix3fv(shader.GetUniform("NormalMatrix"), 1, GL_FALSE, glm::value_ptr(nmat));
-							// glUniformMatrix4fv(shader.GetUniform("ModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelmat));
 							glUniformMatrix4fv(shad.GetUniform("model"), 1, GL_FALSE, glm::value_ptr(mvp));
-							// BindTextureIfNeededv2(core, entity);
 							glBuffer.Draw(mesh);
 						});
 					glBindFramebuffer(GL_FRAMEBUFFER, 0);
