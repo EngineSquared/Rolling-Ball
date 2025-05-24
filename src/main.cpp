@@ -222,7 +222,7 @@ int main(void)
 	bool created = false;
 	core.RegisterSystem<ES::Engine::Scheduler::Update>(
 		[&depthMapFBO, &depthMap, &created](ES::Engine::Core &core) {
-			if (core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().GetCurrentScene() != "game_first_level" || created)
+			if (core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().GetCurrentScene().value_or("") != "game_first_level" || created)
 				return;
 			created = true;
 			core.RegisterSystem<ES::Plugin::RenderingPipeline::ToGPU>(
