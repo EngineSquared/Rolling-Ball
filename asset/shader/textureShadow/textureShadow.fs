@@ -5,7 +5,6 @@ in vec3 Normal;
 in vec2 TexCoord;
 in vec4 FragPosLightSpace;
 
-uniform sampler2D texture0;
 uniform sampler2D shadowMap;
 
 uniform vec3 CamPos;
@@ -61,7 +60,6 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 }
 
 void main() {
-    vec3 base_color = texture(texture0, TexCoord).rgb;
     vec3 finalColor = vec3(0.0, 0.0, 0.0);
     vec3 ambient = vec3(0.0, 0.0, 0.0);
 
@@ -86,5 +84,5 @@ void main() {
         }
     }
     finalColor += ambient;
-    FragColor = vec4(finalColor + base_color * 0.01, 1.0);
+    FragColor = vec4(finalColor, 1.0);
 }
