@@ -73,5 +73,5 @@ void main() {
         }
     }
     finalColor += ambient;
-    FragColor = vec4(finalColor, 1.0);
+    FragColor = vec4(finalColor + base_color * 0.01, 1.0);
 }
