@@ -187,24 +187,25 @@ int main(void)
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
 	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(Game::SaveGameState);
 
+	glm::vec3 posOfLight(6.f, 20.f, 6.f);
+	float near_plane = 1.0f;
+	float far_plane = 50.f;
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, near_plane, far_plane);
+	// make posOfLight rotate around the center
+	glm::mat4 lightView = glm::lookAt(posOfLight, 
+						glm::vec3( 0.0f, 5.0f, 0.0f), 
+						glm::vec3( 0.0f, 1.0f,  0.0f));
+
+	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
 	core.RegisterSystem<ES::Engine::Scheduler::Update>(
 		ES::Plugin::Scene::System::UpdateScene,
         ES::Plugin::UI::System::ButtonClick,
         ES::Engine::Entity::RemoveTemporaryComponents,
         ES::Plugin::UI::System::UpdateButtonState,
         ES::Plugin::UI::System::UpdateButtonTexture,
-		[&depthMap](ES::Engine::Core &core){
+		[&depthMap, &lightSpaceMatrix](ES::Engine::Core &core){
 			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"textureShadow"});
-			glm::vec3 posOfLight(6.f, 20.f, 6.f);
-			float near_plane = 1.0f;
-			float far_plane = 50.f;
-			glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, near_plane, far_plane);
-			// make posOfLight rotate around the center
-			glm::mat4 lightView = glm::lookAt(posOfLight, 
-								glm::vec3( 0.0f, 5.0f, 0.0f), 
-								glm::vec3( 0.0f, 1.0f,  0.0f));
-
-			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 			shaderProgram.Use();
 			glActiveTexture(GL_TEXTURE1);
@@ -215,18 +216,8 @@ int main(void)
 			glUniform3fv(shaderProgram.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
 			shaderProgram.Disable();
 		},
-		[&depthMap](ES::Engine::Core &core){
+		[&depthMap, &lightSpaceMatrix](ES::Engine::Core &core){
 			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"texture"});
-			glm::vec3 posOfLight(6.f, 20.f, 6.f);
-			float near_plane = 1.0f;
-			float far_plane = 50.f;
-			glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, near_plane, far_plane);
-			// make posOfLight rotate around the center
-			glm::mat4 lightView = glm::lookAt(posOfLight, 
-								glm::vec3( 0.0f, 5.0f, 0.0f), 
-								glm::vec3( 0.0f, 1.0f,  0.0f));
-
-			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 			shaderProgram.Use();
 			glActiveTexture(GL_TEXTURE1);
@@ -237,18 +228,8 @@ int main(void)
 			glUniform3fv(shaderProgram.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
 			shaderProgram.Disable();
 		},
-		[](ES::Engine::Core &core){
+		[&lightSpaceMatrix](ES::Engine::Core &core){
 			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"shadow"});
-			glm::vec3 posOfLight(6.f, 20.f, 6.f);
-			float near_plane = 1.0f;
-			float far_plane = 50.f;
-			glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, near_plane, far_plane);
-			// make posOfLight rotate around the center
-			glm::mat4 lightView = glm::lookAt(posOfLight, 
-								glm::vec3( 0.0f, 5.0f, 0.0f), 
-								glm::vec3( 0.0f, 1.0f,  0.0f));
-
-			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 			
 			shaderProgram.Use();
 			glUniformMatrix4fv(shaderProgram.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
@@ -262,7 +243,7 @@ int main(void)
 			// use depth shader
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-			glDisable(GL_CULL_FACE);
+			glCullFace(GL_FRONT);
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			auto &shad = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get("shadow"_hs);
@@ -282,8 +263,6 @@ int main(void)
 				});
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			
-			
-			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 			auto cameraSize = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().size;
 			glViewport(0, 0, static_cast<int>(cameraSize.x), static_cast<int>(cameraSize.y));
