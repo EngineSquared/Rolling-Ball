@@ -206,64 +206,78 @@ int main(void)
         ES::Plugin::UI::System::UpdateButtonTexture,
 		[&depthMap, &lightSpaceMatrix](ES::Engine::Core &core){
 			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"textureShadow"});
-
 			shaderProgram.Use();
+
+			// Link texture to the shader
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, depthMap);
 			glUniform1i(shaderProgram.GetUniform("shadowMap"), 1);
-			glActiveTexture(GL_TEXTURE0);
+
+			// Link Light Space Matrix to the shader
 			glUniformMatrix4fv(shaderProgram.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+			
+			// Link Camera Position to the shader
 			glUniform3fv(shaderProgram.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
+			
 			shaderProgram.Disable();
 		},
 		[&depthMap, &lightSpaceMatrix](ES::Engine::Core &core){
 			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"texture"});
 
 			shaderProgram.Use();
+
+			// Link texture to the shader
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, depthMap);
 			glUniform1i(shaderProgram.GetUniform("shadowMap"), 1);
-			glActiveTexture(GL_TEXTURE0);
+
+			// Link Light Space Matrix to the shader
 			glUniformMatrix4fv(shaderProgram.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+			
+			// Link Camera Position to the shader
 			glUniform3fv(shaderProgram.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
+			
 			shaderProgram.Disable();
 		},
 		[&lightSpaceMatrix](ES::Engine::Core &core){
 			auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"shadow"});
 			
 			shaderProgram.Use();
+
+			// Link Light Space Matrix to the shader
 			glUniformMatrix4fv(shaderProgram.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+			
 			shaderProgram.Disable();
 		}
 	);
 
 	core.RegisterSystem<ES::Plugin::RenderingPipeline::ToGPU>(
+		// Render the shadow map
 		[&depthMapFBO, &depthMap](ES::Engine::Core &core) {
-			using namespace entt;
-			// use depth shader
+			// Setup the framebuffer for shadow mapping
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 			glCullFace(GL_FRONT);
 			glClear(GL_DEPTH_BUFFER_BIT);
 
-			auto &shad = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get("shadow"_hs);
+			// Render mesh on the shadow map
+			auto &shad = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"shadow"});
 			shad.Use();
-			
-			auto &view = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().view;
-			auto &projection = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().projection;
 			core.GetRegistry()
 				.view<ES::Plugin::OpenGL::Component::ModelHandle, ES::Plugin::Object::Component::Transform, ES::Plugin::Object::Component::Mesh>()
 				.each([&](auto entity, ES::Plugin::OpenGL::Component::ModelHandle &modelHandle, ES::Plugin::Object::Component::Transform &transform,
 						ES::Plugin::Object::Component::Mesh &mesh) {
 					const auto &glBuffer = core.GetResource<ES::Plugin::OpenGL::Resource::GLMeshBufferManager>().Get(modelHandle.id);
 					glm::mat4 modelmat = transform.getTransformationMatrix();
-					glm::mat4 mvp = modelmat;
-					glUniformMatrix4fv(shad.GetUniform("model"), 1, GL_FALSE, glm::value_ptr(mvp));
+					glUniformMatrix4fv(shad.GetUniform("model"), 1, GL_FALSE, glm::value_ptr(modelmat));
 					glBuffer.Draw(mesh);
-				});
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			
+				}
+			);
+			shad.Disable();
+				
+			// Put the default state back
 			glCullFace(GL_BACK);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			auto cameraSize = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>().size;
 			glViewport(0, 0, static_cast<int>(cameraSize.x), static_cast<int>(cameraSize.y));
 		}
