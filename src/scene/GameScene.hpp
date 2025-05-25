@@ -90,7 +90,7 @@ namespace Game
 
             AddLights(core, "default");
             AddLights(core, "texture");
-            AddLights(core, "textureShadow");            
+            AddLights(core, "noTextureLightShadow");            
         }
 
         void AddLights(ES::Engine::Core &core, const std::string &shaderName)
