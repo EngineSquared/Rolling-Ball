@@ -15,9 +15,14 @@
 #include "FixedTimeUpdate.hpp"
 #include "InputManager.hpp"
 #include "SoundManager.hpp"
+#include "UIResource.hpp"
 #include "Sounds.hpp"
 #include "Input.hpp"
 #include "InitSound.hpp"
+#include "InitUI.hpp"
+#include "UpdateUI.hpp"
+#include "RenderingPipeline.hpp"
+#include "PluginUI.hpp"
 
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
@@ -56,7 +61,7 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin>();
+	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin, UI::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
 	core.RegisterResource<ES::Plugin::Sound::Resource::SoundManager>(ES::Plugin::Sound::Resource::SoundManager());

@@ -20,6 +20,15 @@ namespace Game
             PlayButton(core);
             OptionButton(core);
             QuitButton(core);
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/font/Tomorrow-Medium.ttf");
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/demo/LatoLatin-Bold.ttf");
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/demo/LatoLatin-BoldItalic.ttf");
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/demo/LatoLatin-Italic.ttf");
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/demo/LatoLatin-Regular.ttf");
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/demo/NotoEmoji-Regular.ttf");
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().InitDocument("asset/demo/demo.rml");
+            
+            auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
         }
     
         void _onDestroy(ES::Engine::Core &) final

@@ -1,0 +1,16 @@
+<rml>
+  <head>
+    <style>
+      body {
+        background-color: red;
+        font-family: LatoLatin;
+        font-size: 20px;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="invader.tga" />
+    <div>Hello, UI!</div>
+  </body>
+</rml>

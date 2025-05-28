@@ -27,7 +27,7 @@ target("RollingBall")
     add_includedirs("$(projectdir)/src/utils")
     add_includedirs("$(projectdir)/src/ui")
 
-    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
+    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio", "rmlui")
 
     set_rundir("$(projectdir)")
 
