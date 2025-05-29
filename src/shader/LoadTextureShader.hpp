@@ -15,6 +15,8 @@ void LoadTextureShader(ES::Engine::Core &core)
     sp.Create();
     sp.InitFromFiles(vertexShader, fragmentShader);
     sp.AddUniform("texture0");
+    sp.AddUniform("lightSpaceMatrix");
+    sp.AddUniform("shadowMap");
 	sp.AddUniform("MVP");
     sp.AddUniform("ModelMatrix");
     sp.AddUniform("NormalMatrix");

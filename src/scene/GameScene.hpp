@@ -18,6 +18,7 @@
 #include "OpenGL.hpp"
 #include "Events.hpp"
 #include "SoundManager.hpp"
+#include "Window.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>
@@ -87,6 +88,7 @@ namespace Game
 
             AddLights(core, "default");
             AddLights(core, "texture");
+            AddLights(core, "noTextureLightShadow");            
         }
 
         void AddLights(ES::Engine::Core &core, const std::string &shaderName)

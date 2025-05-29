@@ -150,7 +150,7 @@ ES::Engine::Entity Game::CreateTerrainPiece(ES::Engine::Core &core, const Terrai
     ES::Engine::Entity terrainEntity = core.CreateEntity();
 
     terrainEntity.AddComponent<Object::Component::Transform>(core, piece.position, piece.scale, piece.rotationAngle);
-    terrainEntity.AddComponent<OpenGL::Component::ShaderHandle>(core, "default");
+    terrainEntity.AddComponent<OpenGL::Component::ShaderHandle>(core, "noTextureLightShadow");
     terrainEntity.AddComponent<OpenGL::Component::MaterialHandle>(core, "default");
     if (piece.type == TerrainType::Finish)
         terrainEntity.AddComponent<Game::Finish>(core);

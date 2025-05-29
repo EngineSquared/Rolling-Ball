@@ -46,11 +46,34 @@
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "RenderingPipeline.hpp"
 
 using namespace JPH; // NOT RECOMMENDED
 
 using namespace JPH::literals;
 using namespace ES::Plugin;
+
+void UpdateTextureLightShadowShader(ES::Engine::Core &core){
+	const auto &light = core.GetResource<ES::Plugin::OpenGL::Resource::DirectionalLight>();
+	if (!light.enabled)
+		return;
+	auto &shaderProgram = core.GetResource<ES::Plugin::OpenGL::Resource::ShaderManager>().Get(entt::hashed_string{"texture"});
+
+	shaderProgram.Use();
+
+	// Link texture to the shader
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, light.depthMap);
+	glUniform1i(shaderProgram.GetUniform("shadowMap"), 1);
+
+	// Link Light Space Matrix to the shader
+	glUniformMatrix4fv(shaderProgram.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
+	
+	// Link Camera Position to the shader
+	glUniform3fv(shaderProgram.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
+	
+	shaderProgram.Disable();
+}
 
 int main(void)
 {
@@ -69,6 +92,20 @@ int main(void)
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+		[](const ES::Engine::Core &c) {
+			glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity,
+				GLsizei length, const GLchar *message, const void *userParam) {
+				std::cerr << "GL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "")
+						  << " Source: " << source
+						  << ", Type: " << type
+						  << ", ID: " << id
+						  << ", Severity: " << severity
+						  << ", Message: " << message << std::endl;
+			}, nullptr);
+			glfwSetErrorCallback([](int error, const char *description) {
+				std::cerr << "GLFW ERROR: " << error << ": " << description << std::endl;
+			});
+		},
 		[](ES::Engine::Core &c) {
 			c.GetResource<Window::Resource::Window>().SetTitle("ES Rolling-Ball");
 			c.GetResource<Window::Resource::Window>().SetSize(1280, 720);
@@ -95,12 +132,17 @@ int main(void)
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>(Game::RetrieveSaveGameState);
 	core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(Game::SaveGameState);
 
+
 	core.RegisterSystem<ES::Engine::Scheduler::Update>(
 		ES::Plugin::Scene::System::UpdateScene,
         ES::Plugin::UI::System::ButtonClick,
         ES::Engine::Entity::RemoveTemporaryComponents,
         ES::Plugin::UI::System::UpdateButtonState,
         ES::Plugin::UI::System::UpdateButtonTexture
+	);
+
+	core.RegisterSystem<ES::Plugin::RenderingPipeline::RenderSetup>(
+		UpdateTextureLightShadowShader
 	);
 
 	core.RegisterSystem<ES::Engine::Scheduler::Startup>([&](ES::Engine::Core &c) {
