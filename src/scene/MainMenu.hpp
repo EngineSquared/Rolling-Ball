@@ -2,6 +2,7 @@
 
 #include "Core.hpp"
 #include "UI.hpp"
+#include "UIResource.hpp"
 #include "HasChanged.hpp"
 #include <variant>
 
@@ -27,8 +28,6 @@ namespace Game
             core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/demo/LatoLatin-Regular.ttf");
             core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetFont("asset/demo/NotoEmoji-Regular.ttf");
             core.GetResource<ES::Plugin::UI::Resource::UIResource>().InitDocument("asset/demo/demo.rml");
-            
-            auto &textureManager = core.GetResource<ES::Plugin::OpenGL::Resource::TextureManager>();
         }
     
         void _onDestroy(ES::Engine::Core &) final
