@@ -59,7 +59,10 @@ namespace Game
                     c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("game_second_level");
                 };
             }
-            AddTimeDisplay(core);
+            core.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/game/game.rml");
+            core.RegisterSystem<ES::Engine::Scheduler::Update>(
+                [this](ES::Engine::Core &core) { this->UpdateTextTime(core); }
+            );
             _entitiesToKill.insert(_entitiesToKill.end(), entities.begin(), entities.end());
             core.RegisterSystem<ES::Engine::Scheduler::Update>(
                 Game::UpdateTime,
@@ -89,6 +92,14 @@ namespace Game
             AddLights(core, "default");
             AddLights(core, "texture");
             AddLights(core, "noTextureLightShadow");            
+        }
+
+        void UpdateTextTime(ES::Engine::Core &core)
+        {
+            std::ostringstream timeStream;
+            timeStream << std::fixed << std::setprecision(3) << core.GetResource<Game::Time>().ts;
+
+            core.GetResource<ES::Plugin::UI::Resource::UIResource>().UpdateInnerContent("time-value", timeStream.str());
         }
 
         void AddLights(ES::Engine::Core &core, const std::string &shaderName)
