@@ -1,0 +1,12 @@
+<rml>
+	<head>
+		<title>Rolling-Ball</title>
+		<link type="text/rcss" href="option-menu.rcss" />
+	</head>
+	<body>
+		<div id="menu">
+			<img id="main-menu-btn" src="../../textures/StartButton.png"></img>
+			<img id="fullscreen-btn" src="../../textures/FullscreenNormal.png"></img>
+		</div>
+	</body>
+</rml>

@@ -25,6 +25,18 @@ namespace Game
                     core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("button_click");
                 }
             });
+            core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("option-game-btn", "click", [&core](const std::string &event, const std::string &elementId) {
+                if (elementId == "option-game-btn" && event == "click") {
+                    core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("button_click");
+                    core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("option");
+                }
+            });
+            core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("quit-game-btn", "click", [&core](const std::string &event, const std::string &elementId) {
+                if (elementId == "quit-game-btn" && event == "click") {
+                    core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("button_click");
+                    core.Stop();
+                }
+            });
         }
     
         void _onDestroy(ES::Engine::Core &) final
