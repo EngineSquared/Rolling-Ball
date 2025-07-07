@@ -1,9 +1,6 @@
 body
 {
     font-family: Tomorrow;
-    margin: auto;
-    vertical-align: center;
-    display: inline-block;
 }
 
 #menu
@@ -11,26 +8,19 @@ body
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100vh;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
     gap: 20px;
 }
 
-#main-menu-btn
-{
-    transition: transform 0.6s elastic-out;
-}
-
-#main-menu-btn:hover
-{
-    transition: transform 0.6s elastic-out;
-    transform: scale(1.03);
-}
-
+#main-menu-btn,
 #fullscreen-btn
 {
     transition: transform 0.6s elastic-out;
 }
 
+#main-menu-btn:hover,
 #fullscreen-btn:hover
 {
     transition: transform 0.6s elastic-out;

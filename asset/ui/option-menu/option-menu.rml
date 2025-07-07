@@ -5,8 +5,12 @@
 	</head>
 	<body>
 		<div id="menu">
-			<img id="main-menu-btn" src="../../textures/StartButton.png"></img>
-			<img id="fullscreen-btn" src="../../textures/FullscreenNormal.png"></img>
+			<div>
+				<img id="main-menu-btn" src="../../textures/StartButton.png"></img>
+			</div>
+			<div>
+				<img id="fullscreen-btn" src="../../textures/FullscreenNormal.png"></img>
+			</div>
 		</div>
 	</body>
 </rml>
