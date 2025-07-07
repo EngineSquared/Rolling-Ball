@@ -88,7 +88,17 @@ namespace Game
 
             AddLights(core, "default");
             AddLights(core, "texture");
-            AddLights(core, "noTextureLightShadow");            
+            AddLights(core, "noTextureLightShadow");
+
+            std::array<std::string, 6> faces = {
+                "asset/skybox/right.jpg",
+                "asset/skybox/left.jpg",
+                "asset/skybox/top.jpg",
+                "asset/skybox/bottom.jpg",
+                "asset/skybox/front.jpg",
+                "asset/skybox/back.jpg"
+            };
+            ES::Plugin::OpenGL::Utils::CreateSkyBox(core, faces);
         }
 
         void AddLights(ES::Engine::Core &core, const std::string &shaderName)
@@ -160,6 +170,16 @@ namespace Game
                 AddLights(core, "default");
                 AddLights(core, "texture");
                 core.GetResource<ES::Plugin::Sound::Resource::SoundManager>().Play("ambient_music");
+
+                std::array<std::string, 6> faces = {
+                    "asset/skybox/right.jpg",
+                    "asset/skybox/left.jpg",
+                    "asset/skybox/top.jpg",
+                    "asset/skybox/bottom.jpg",
+                    "asset/skybox/front.jpg",
+                    "asset/skybox/back.jpg"
+                };
+                ES::Plugin::OpenGL::Utils::CreateSkyBox(core, faces);
             }
 
             void AddLights(ES::Engine::Core &core, const std::string &shaderName)

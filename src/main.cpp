@@ -68,10 +68,10 @@ void UpdateTextureLightShadowShader(ES::Engine::Core &core){
 
 	// Link Light Space Matrix to the shader
 	glUniformMatrix4fv(shaderProgram.GetUniform("lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
-	
+
 	// Link Camera Position to the shader
 	glUniform3fv(shaderProgram.GetUniform("CamPos"), 1, glm::value_ptr(core.GetResource<OpenGL::Resource::Camera>().viewer.getViewPoint()));
-	
+
 	shaderProgram.Disable();
 }
 
