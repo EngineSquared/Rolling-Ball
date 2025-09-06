@@ -1,0 +1,28 @@
+body
+{
+    font-family: Tomorrow;
+}
+
+#menu
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+    gap: 20px;
+}
+
+#main-menu-btn,
+#fullscreen-btn
+{
+    transition: transform 0.6s elastic-out;
+}
+
+#main-menu-btn:hover,
+#fullscreen-btn:hover
+{
+    transition: transform 0.6s elastic-out;
+    transform: scale(1.03);
+}

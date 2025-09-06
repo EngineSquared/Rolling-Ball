@@ -1,0 +1,12 @@
+<rml>
+	<head>
+		<title>Rolling-Ball</title>
+		<link type="text/template" href="time-elapsed.rml" />
+		<link type="text/rcss" href="game.rcss" />
+	</head>
+	<body>
+		<div template="time-elapsed">
+			<template content="time-elapsed" src="time-elapsed"></template>
+		</div>
+	</body>
+</rml>

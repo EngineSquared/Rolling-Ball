@@ -1,0 +1,29 @@
+body
+{
+    font-family: Tomorrow;
+}
+
+#menu
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+    gap: 20px;
+}
+
+#start-game-btn,
+#option-game-btn,
+#quit-game-btn
+{
+    transition: transform 0.6s elastic-out;
+}
+
+#start-game-btn:hover,
+#option-game-btn:hover,
+#quit-game-btn:hover
+{
+    transform: scale(1.03);
+}

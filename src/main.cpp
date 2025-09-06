@@ -79,7 +79,7 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin>();
+	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin, UI::Plugin>();
 
 	core.RegisterResource<ES::Plugin::Scene::Resource::SceneManager>(ES::Plugin::Scene::Resource::SceneManager());
 	core.RegisterResource<ES::Plugin::Sound::Resource::SoundManager>(ES::Plugin::Sound::Resource::SoundManager());
@@ -92,9 +92,9 @@ int main(void)
 	core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main_menu");
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
-		[](const ES::Engine::Core &c) {
+		[](const ES::Engine::Core &) {
 			glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity,
-				GLsizei length, const GLchar *message, const void *userParam) {
+				GLsizei, const GLchar *message, const void *) {
 				std::cerr << "GL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "")
 						  << " Source: " << source
 						  << ", Type: " << type
@@ -135,10 +135,10 @@ int main(void)
 
 	core.RegisterSystem<ES::Engine::Scheduler::Update>(
 		ES::Plugin::Scene::System::UpdateScene,
-        ES::Plugin::UI::System::ButtonClick,
-        ES::Engine::Entity::RemoveTemporaryComponents,
-        ES::Plugin::UI::System::UpdateButtonState,
-        ES::Plugin::UI::System::UpdateButtonTexture
+        // ES::Plugin::UI::System::ButtonClick,
+        ES::Engine::Entity::RemoveTemporaryComponents
+        // ES::Plugin::UI::System::UpdateButtonState,
+        // ES::Plugin::UI::System::UpdateButtonTexture
 	);
 
 	core.RegisterSystem<ES::Plugin::RenderingPipeline::RenderSetup>(
