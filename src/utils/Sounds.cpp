@@ -1,5 +1,5 @@
 #include "Sounds.hpp"
-#include "SoundManager.hpp"
+#include "resource/SoundManager.hpp"
 
 void Game::RegisterGameSounds(ES::Engine::Core &core)
 {

@@ -1,11 +1,11 @@
 #include "AddPlayerJumpCallback.hpp"
 
-#include "Camera.hpp"
-#include "RigidBody3D.hpp"
-#include "SoftBody3D.hpp"
+#include "resource/Camera.hpp"
+#include "component/RigidBody3D.hpp"
+#include "component/SoftBody3D.hpp"
 #include "Player.hpp"
-#include "InputUtils.hpp"
-#include "PhysicsManager.hpp"
+#include "Input.hpp"
+#include "resource/PhysicsManager.hpp"
 #include "Input.hpp"
 #include "JumpImpulse.hpp"
 

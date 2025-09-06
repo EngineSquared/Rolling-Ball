@@ -1,8 +1,8 @@
 #include "Events.hpp"
 #include "Terrain.hpp"
-#include "RigidBody3D.hpp"
-#include "Transform.hpp"
-#include "RelativeTimeUpdate.hpp"
+#include "component/RigidBody3D.hpp"
+#include "component/Transform.hpp"
+#include "scheduler/RelativeTimeUpdate.hpp"
 
 void Game::MoveSegmentsSideway(ES::Engine::Core &core)
 {

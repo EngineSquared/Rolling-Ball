@@ -1,24 +1,18 @@
 #ifndef VULKAN
 #    include <GL/glew.h>
 #endif
-#include "Core.hpp"
 #include "Engine.hpp"
-#include "Entity.hpp"
-#include "Transform.hpp"
+#include "component/Transform.hpp"
 
 #include "JoltPhysics.hpp"
 #include "OpenGL.hpp"
-#include "Window.hpp"
-#include "Camera.hpp"
-#include "Light.hpp"
-#include "LightInfo.hpp"
-#include "FixedTimeUpdate.hpp"
-#include "InputManager.hpp"
-#include "SoundManager.hpp"
-#include "Sounds.hpp"
+#include "resource/window/Window.hpp"
+#include "OpenGL.hpp"
+#include "Engine.hpp"
 #include "Input.hpp"
-#include "InitSound.hpp"
+#include "Sound.hpp"
 
+#include "Sounds.hpp"
 #include "SpawnPlayer.hpp"
 #include "PointCameraToPlayer.hpp"
 #include "PlayerMovement.hpp"

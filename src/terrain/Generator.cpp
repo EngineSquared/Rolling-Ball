@@ -1,8 +1,8 @@
-#include "Transform.hpp"
+#include "component/Transform.hpp"
 
 #include "JoltPhysics.hpp"
 #include "OpenGL.hpp"
-#include "OBJLoader.hpp"
+#include "Object.hpp"
 
 #include "Generator.hpp"
 #include "FinishSegment.hpp"

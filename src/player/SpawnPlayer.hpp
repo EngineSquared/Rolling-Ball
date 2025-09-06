@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.hpp"
+#include "core/Core.hpp"
 
 namespace Game {
     ES::Engine::Entity SpawnPlayer(ES::Engine::Core &core);

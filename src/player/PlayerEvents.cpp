@@ -1,10 +1,9 @@
 #include "PlayerEvents.hpp"
 
-#include "PhysicsManager.hpp"
-#include "RigidBody3D.hpp"
+#include "JoltPhysics.hpp"
 #include "FinishSegment.hpp"
 #include "Player.hpp"
-#include "SceneManager.hpp"
+#include "Scene.hpp"
 
 void Game::PlayerEvents(ES::Engine::Core &core)
 {

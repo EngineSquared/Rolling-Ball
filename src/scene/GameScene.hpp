@@ -5,7 +5,7 @@
 #include "PlayerEvents.hpp"
 #include "PointCameraToPlayer.hpp"
 #include "SpawnPlayer.hpp"
-#include "Core.hpp"
+#include "core/Core.hpp"
 #include "UI.hpp"
 #include "HasChanged.hpp"
 #include "Player.hpp"
@@ -17,8 +17,8 @@
 #include "UpdateTime.hpp"
 #include "OpenGL.hpp"
 #include "Events.hpp"
-#include "SoundManager.hpp"
-#include "Window.hpp"
+#include "Sound.hpp"
+#include "resource/window/Window.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>

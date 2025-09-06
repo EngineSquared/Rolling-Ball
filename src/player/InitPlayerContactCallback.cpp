@@ -1,6 +1,6 @@
 #include "InitPlayerContactCallback.hpp"
 
-#include "PhysicsManager.hpp"
+#include "resource/PhysicsManager.hpp"
 #include "Player.hpp"
 #include "Terrain.hpp"
 #include "FinishSegment.hpp"

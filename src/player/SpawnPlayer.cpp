@@ -1,10 +1,9 @@
 #include "SpawnPlayer.hpp"
 
 #include "Engine.hpp"
-#include "Entity.hpp"
-#include "Transform.hpp"
+#include "component/Transform.hpp"
 #include "Player.hpp"
-#include "Camera.hpp"
+#include "resource/Camera.hpp"
 #include "Terrain.hpp"
 
 #include "JoltPhysics.hpp"

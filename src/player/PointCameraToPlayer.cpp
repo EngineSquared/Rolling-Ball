@@ -1,7 +1,7 @@
 #include "PointCameraToPlayer.hpp"
 
-#include "Camera.hpp"
-#include "Transform.hpp"
+#include "resource/Camera.hpp"
+#include "component/Transform.hpp"
 #include "Player.hpp"
 
 void Game::PointCameraToPlayer(ES::Engine::Core &core)

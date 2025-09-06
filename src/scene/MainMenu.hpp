@@ -1,6 +1,6 @@
 #include "Scene.hpp"
 
-#include "Core.hpp"
+#include "core/Core.hpp"
 #include "UI.hpp"
 #include "HasChanged.hpp"
 #include <variant>

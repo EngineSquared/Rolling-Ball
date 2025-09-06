@@ -1,22 +1,22 @@
-add_requires("entt", "gtest", "glm >=1.0.1", "glfw >=3.4", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
-add_requires("rmlui >=6.0", { configs = { transform = true } })
-
 set_project("JoltPhysics-Test")
 set_languages("c++20")
 
 add_rules("mode.debug", "mode.release")
 
-includes("../EngineSquared/xmake.lua")
+add_repositories("package_repo https://github.com/EngineSquared/xrepo.git")
+
+add_requires("enginesquared v0.1.0")
 
 -- add /W4 for windows
 if is_plat("windows") then
     add_cxflags("/W4")
 end
 
+add_rules("plugin.compile_commands.autoupdate", {outputdir = ".vscode"})
 target("RollingBall")
     set_kind("binary")
     set_default(true)
-    add_deps("EngineSquared")
+    add_packages("enginesquared")
 
     add_files("src/**.cpp")
     add_includedirs("$(projectdir)/src/")
@@ -27,8 +27,6 @@ target("RollingBall")
     add_includedirs("$(projectdir)/src/shader")
     add_includedirs("$(projectdir)/src/utils")
     add_includedirs("$(projectdir)/src/ui")
-
-    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio", "rmlui")
 
     set_rundir("$(projectdir)")
 
