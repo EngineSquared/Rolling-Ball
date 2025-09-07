@@ -18,7 +18,7 @@
 #include "OpenGL.hpp"
 #include "Events.hpp"
 #include "Sound.hpp"
-#include "resource/window/Window.hpp"
+#include "resource/Window/Window.hpp"
 #include <variant>
 
 #include <Jolt/RegisterTypes.h>

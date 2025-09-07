@@ -6,7 +6,7 @@
 
 #include "JoltPhysics.hpp"
 #include "OpenGL.hpp"
-#include "resource/window/Window.hpp"
+#include "resource/Window/Window.hpp"
 #include "OpenGL.hpp"
 #include "Engine.hpp"
 #include "Input.hpp"
